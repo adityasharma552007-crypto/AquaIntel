@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =============================================================================
-# MilkGuard - Complete Deployment Commands
+# AquaIntel - Complete Deployment Commands
 # =============================================================================
 # Copy and paste these commands to deploy the APK download page.
 # =============================================================================
@@ -30,10 +30,10 @@ mkdir -p /media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web/public/downloads
 
 # Copy APK
 cp /media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/android/app/build/outputs/apk/release/app-release.apk \
-   /media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web/public/downloads/MilkGuard.apk
+   /media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web/public/downloads/AquaIntel.apk
 
 # Set permissions
-chmod 644 /media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web/public/downloads/MilkGuard.apk
+chmod 644 /media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web/public/downloads/AquaIntel.apk
 
 # -----------------------------------------------------------------------------
 # STEP 3: Update version.json with actual APK size
@@ -43,10 +43,10 @@ echo "=== STEP 3: Update version.json ==="
 cd /media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web
 
 # Get APK size in bytes
-APK_SIZE_BYTES=$(stat -c%s public/downloads/MilkGuard.apk)
+APK_SIZE_BYTES=$(stat -c%s public/downloads/AquaIntel.apk)
 
 # Get human-readable size
-APK_SIZE_HUMAN=$(du -h public/downloads/MilkGuard.apk | cut -f1)
+APK_SIZE_HUMAN=$(du -h public/downloads/AquaIntel.apk | cut -f1)
 
 # Update version.json (requires jq)
 jq --arg size "$APK_SIZE_HUMAN" \
@@ -96,23 +96,23 @@ echo "=== STEP 6: Test Deployment ==="
 # Wait for Vercel deployment to complete, then test:
 
 # Test version.json endpoint
-curl -s https://milkguard.vercel.app/downloads/version.json | jq
+curl -s https://AquaIntel.vercel.app/downloads/version.json | jq
 
 # Test APK download headers
-curl -I https://milkguard.vercel.app/downloads/MilkGuard.apk
+curl -I https://AquaIntel.vercel.app/downloads/AquaIntel.apk
 
 # Expected headers:
 # Content-Type: application/vnd.android.package-archive
-# Content-Disposition: attachment; filename="MilkGuard.apk"
+# Content-Disposition: attachment; filename="AquaIntel.apk"
 # Cache-Control: public, max-age=3600
 
 # Download and verify file integrity
-curl -L -o /tmp/test-milkguard.apk https://milkguard.vercel.app/downloads/MilkGuard.apk
-file /tmp/test-milkguard.apk
+curl -L -o /tmp/test-AquaIntel.apk https://AquaIntel.vercel.app/downloads/AquaIntel.apk
+file /tmp/test-AquaIntel.apk
 
 # Compare file sizes
-ls -la /tmp/test-milkguard.apk
-ls -la public/downloads/MilkGuard.apk
+ls -la /tmp/test-AquaIntel.apk
+ls -la public/downloads/AquaIntel.apk
 
 # -----------------------------------------------------------------------------
 # STEP 7: Mobile Testing
@@ -120,12 +120,12 @@ ls -la public/downloads/MilkGuard.apk
 echo "=== STEP 7: Mobile Testing ==="
 
 # On your Android device:
-# 1. Open browser and navigate to: https://milkguard.vercel.app/download
+# 1. Open browser and navigate to: https://AquaIntel.vercel.app/download
 # 2. Click "Download APK"
 # 3. Accept the download when prompted
 # 4. Open the downloaded file
 # 5. Install the app (may need to enable Unknown Sources)
-# 6. Launch MilkGuard and verify it works
+# 6. Launch AquaIntel and verify it works
 
 # -----------------------------------------------------------------------------
 # STEP 8: Verify Download Page
@@ -133,7 +133,7 @@ echo "=== STEP 7: Mobile Testing ==="
 echo "=== STEP 8: Verify Download Page ==="
 
 # Open in browser:
-# https://milkguard.vercel.app/download
+# https://AquaIntel.vercel.app/download
 
 # Check that:
 # [ ] Page loads correctly
@@ -150,13 +150,13 @@ echo "=== STEP 8: Verify Download Page ==="
 # -----------------------------------------------------------------------------
 
 # Quick test - version.json
-curl -s https://milkguard.vercel.app/downloads/version.json | jq '.version,.size'
+curl -s https://AquaIntel.vercel.app/downloads/version.json | jq '.version,.size'
 
 # Quick test - APK headers
-curl -sI https://milkguard.vercel.app/downloads/MilkGuard.apk | grep -E "Content-Type|Content-Disposition"
+curl -sI https://AquaIntel.vercel.app/downloads/AquaIntel.apk | grep -E "Content-Type|Content-Disposition"
 
 # Quick test - Download and verify
-curl -L -s https://milkguard.vercel.app/downloads/MilkGuard.apk | head -c 4 | xxd
+curl -L -s https://AquaIntel.vercel.app/downloads/AquaIntel.apk | head -c 4 | xxd
 
 # Should output: 50 4b 03 04 (ZIP file signature - APKs are ZIP files)
 
@@ -172,7 +172,7 @@ git revert HEAD
 git reset --hard HEAD~1
 
 # Remove download files
-rm -rf public/downloads/MilkGuard.apk
+rm -rf public/downloads/AquaIntel.apk
 rm -rf src/app/download
 rm -rf src/components/download
 

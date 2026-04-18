@@ -66,7 +66,7 @@ export async function recordScanOnBlockchain(
     // const wallet   = new ethers.Wallet(process.env.BLOCKCHAIN_PRIVATE_KEY!, provider)
     // const contract = new ethers.Contract(
     //   process.env.NEXT_PUBLIC_BLOCKCHAIN_CONTRACT_ADDRESS!,
-    //   MILK_GUARD_ABI,
+    //   AQUA_INTEL_ABI,
     //   wallet
     // )
     // const tx = await contract.recordScan(

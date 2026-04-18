@@ -1,5 +1,5 @@
 # =============================================================================
-# ROBOTS.TXT FOR MILKGUARD
+# ROBOTS.TXT FOR AQUAINTEL
 # =============================================================================
 # This file tells search engines which pages they can and cannot crawl.
 #
@@ -11,7 +11,7 @@
 # =============================================================================
 
 # Sitemap location (update domain for production)
-Sitemap: https://milkguard.vercel.app/sitemap.xml
+Sitemap: https://aquaintel.vercel.app/sitemap.xml
 
 # =============================================================================
 # RULES FOR ALL SEARCH ENGINES

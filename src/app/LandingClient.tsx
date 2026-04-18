@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Download } from 'lucide-react'
 
@@ -81,7 +82,7 @@ export default function LandingClient() {
             width: 88,
             height: 88,
             borderRadius: 24,
-            background: 'rgba(255,255,255,0.15)',
+            background: 'rgba(255,255,255,1)',
             backdropFilter: 'blur(10px)',
             border: '1.5px solid rgba(255,255,255,0.25)',
             display: 'flex',
@@ -91,10 +92,16 @@ export default function LandingClient() {
             boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
             position: 'relative',
             overflow: 'hidden',
-            fontSize: 48,
           }}
         >
-          💧
+          <Image
+            src="/logo.png"
+            alt="AquaIntel Logo"
+            width={70}
+            height={70}
+            priority
+            style={{ objectFit: 'contain' }}
+          />
         </motion.div>
 
         {/* App name */}

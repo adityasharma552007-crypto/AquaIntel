@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =============================================================================
-# MilkGuard APK Verification Script
+# AquaIntel APK Verification Script
 # =============================================================================
 # This script verifies:
 # 1. APK file exists and is readable
@@ -23,11 +23,11 @@ NC='\033[0m' # No Color
 # Configuration
 PROJECT_ROOT="/media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web"
 APK_SOURCE="$PROJECT_ROOT/android/app/build/outputs/apk/release/app-release.apk"
-APK_DEST="$PROJECT_ROOT/public/downloads/MilkGuard.apk"
+APK_DEST="$PROJECT_ROOT/public/downloads/AquaIntel.apk"
 VERSION_JSON="$PROJECT_ROOT/public/downloads/version.json"
 
 echo "============================================"
-echo "  MilkGuard APK Verification Script"
+echo "  AquaIntel APK Verification Script"
 echo "============================================"
 echo ""
 
@@ -185,7 +185,7 @@ if [ $OVERALL_STATUS -eq 0 ]; then
     echo "  Next steps:"
     echo "  1. Commit changes: git add . && git commit -m 'feat: Add APK download'"
     echo "  2. Push to deploy: git push origin main"
-    echo "  3. Test download: curl -I https://your-domain.com/downloads/MilkGuard.apk"
+    echo "  3. Test download: curl -I https://your-domain.com/downloads/AquaIntel.apk"
 else
     echo -e "  ${RED}✗ Some checks failed${NC}"
     echo ""
@@ -194,7 +194,7 @@ else
         echo "  - Build APK: cd android && ./gradlew assembleRelease"
     fi
     if [ ! -f "$APK_DEST" ]; then
-        echo "  - Copy APK to: public/downloads/MilkGuard.apk"
+        echo "  - Copy APK to: public/downloads/AquaIntel.apk"
     fi
     if [ ! -f "$VERSION_JSON" ]; then
         echo "  - Create version.json in public/downloads/"

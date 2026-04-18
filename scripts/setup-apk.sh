@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # =============================================================================
-# MilkGuard APK Setup Script
+# AquaIntel APK Setup Script
 # =============================================================================
 # Run this script after building the Android APK to set up the download page.
 # =============================================================================
@@ -10,11 +10,11 @@ set -e
 
 PROJECT_ROOT="/media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web"
 APK_SOURCE="$PROJECT_ROOT/../android/app/build/outputs/apk/release/app-release.apk"
-APK_DEST="$PROJECT_ROOT/public/downloads/MilkGuard.apk"
+APK_DEST="$PROJECT_ROOT/public/downloads/AquaIntel.apk"
 VERSION_JSON="$PROJECT_ROOT/public/downloads/version.json"
 
 echo "============================================"
-echo "  MilkGuard APK Setup Script"
+echo "  AquaIntel APK Setup Script"
 echo "============================================"
 echo ""
 
@@ -37,8 +37,8 @@ else
     ALT_PATHS=(
         "$PROJECT_ROOT/android/app/build/outputs/apk/release/app-release.apk"
         "$HOME/Downloads/app-release.apk"
-        "$HOME/Downloads/MilkGuard.apk"
-        "$PROJECT_ROOT/MilkGuard.apk"
+        "$HOME/Downloads/AquaIntel.apk"
+        "$PROJECT_ROOT/AquaIntel.apk"
     )
 
     FOUND=false
@@ -123,8 +123,8 @@ echo ""
 
 # Test curl commands
 echo "After deployment, test with:"
-echo "  curl -I https://milkguard.vercel.app/downloads/MilkGuard.apk"
-echo "  curl -s https://milkguard.vercel.app/downloads/version.json | jq"
+echo "  curl -I https://AquaIntel.vercel.app/downloads/AquaIntel.apk"
+echo "  curl -s https://AquaIntel.vercel.app/downloads/version.json | jq"
 echo ""
 
 echo "============================================"
