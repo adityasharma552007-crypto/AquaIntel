@@ -1,6 +1,60 @@
 {
-  "Common": {
-    "welcome": "एक्वाइंटेल में आपका स्वागत है",
-    "dashboard": "डैशबोर्ड"
+  "Navigation": {
+    "home": "होम",
+    "scan": "स्कैन",
+    "map": "नक्शा",
+    "history": "इतिहास",
+    "profile": "प्रोफाइल"
+  },
+  "Dashboard": {
+    "welcomeBack": "वापसी पर स्वागत है",
+    "user": "उपयोगकर्ता",
+    "askAi": "Ask AI",
+    "communityAlert": "सामुदायिक अलर्ट",
+    "flaggedVendors": "⚠️ आपके क्षेत्र में {count} विक्रेता फ़्लैग किए गए हैं",
+    "aiInsights": "AI अंतर्दृष्टि",
+    "newBadge": "नया",
+    "cityRisk": "शहर-व्यापी जोखिम विश्लेषण",
+    "aiActive": "AI सक्रिय",
+    "scanWaterNow": "अब अपना पानी स्कैन करें",
+    "verifyPurity": "AI स्पेक्ट्रल विश्लेषण का उपयोग करके 8 सेकंड में शुद्धता की पुष्टि करें।",
+    "startScanning": "स्कैनिंग शुरू करें",
+    "totalScans": "कुल स्कैन",
+    "safeWater": "सुरक्षित पानी",
+    "recentActivity": "हाल की गतिविधि",
+    "viewAll": "सभी देखें",
+    "homeSample": "होम सैंपल",
+    "safety": "सुरक्षा",
+    "noScansYet": "अभी तक कोई स्कैन नहीं",
+    "startFirstScan": "परिणाम देखने के लिए अपना पहला स्कैन शुरू करें"
+  },
+  "App": {
+    "readyToScan": "स्कैन के लिए तैयार",
+    "scanningWater": "पानी की स्कैनिंग...",
+    "aiAnalysis": "AI विश्लेषण...",
+    "placePod": "पॉड को पानी में रखें",
+    "keepSubmerged": "डिवाइस को डूबा हुआ रखें",
+    "hardwareDisconnected": "हार्डवेयर डिस्कनेक्टेड",
+    "connectDevice": "डिवाइस कनेक्ट करें",
+    "startScan": "स्कैन शुरू करें",
+    "tryAgain": "फिर से प्रयास करें",
+    "connectingPod": "स्पेक्ट्रल पॉड से जुड़ रहा है...",
+    "aiComputing": "AI मिलावट की गणना कर रहा है...",
+    "fssaiCompliant": "FSSAI अनुरूप",
+    "cloudVerified": "क्लाउड सत्यापित",
+    "waterMap": "जल प्रदूषण मानचित्र",
+    "area": "क्षेत्र",
+    "sources": "स्रोत",
+    "safe": "% सुरक्षित",
+    "hazard": "% खतरा",
+    "searchArea": "{city} क्षेत्र या विक्रेता खोजें...",
+    "scanHistory": "स्कैन इतिहास",
+    "yourScans": "तपके स्कैन",
+    "myProfile": "मेरी प्रोफ़ाइल",
+    "totalScansL": "कुल स्कैन",
+    "safeL": "सुरक्षित",
+    "unsafeL": "असुरक्षित",
+    "myAuthorityReports": "मेरी प्राधिकरण रिपोर्ट 📋",
+    "accountSettings": "खाता सेटिंग्स ⚙️"
   }
 }

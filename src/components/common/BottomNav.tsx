@@ -10,21 +10,23 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Home, Scan, Map, History, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Navigation tabs with SEO-friendly link structure
-// Each href is a crawlable internal link that helps search engine discovery
-const tabs = [
-  { name: 'Home',     href: '/home',     icon: Home,     label: 'Dashboard' },
-  { name: 'Scan',     href: '/scan',     icon: Scan,     label: 'Test Water' },
-  { name: 'Map',      href: '/map',      icon: Map,      label: 'Vendors' },
-  { name: 'History',  href: '/history',  icon: History,  label: 'Results' },
-  { name: 'Profile',  href: '/profile',  icon: User,     label: 'Account' },
-]
-
 export function BottomNav() {
   const pathname = usePathname()
+  const t = useTranslations('Navigation')
+
+  // Navigation tabs with SEO-friendly link structure
+  // Each href is a crawlable internal link that helps search engine discovery
+  const tabs = [
+    { name: t('home'),     href: '/home',     icon: Home,     label: 'Dashboard' },
+    { name: t('scan'),     href: '/scan',     icon: Scan,     label: 'Test Water' },
+    { name: t('map'),      href: '/map',      icon: Map,      label: 'Vendors' },
+    { name: t('history'),  href: '/history',  icon: History,  label: 'Results' },
+    { name: t('profile'),  href: '/profile',  icon: User,     label: 'Account' },
+  ]
 
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center pointer-events-none px-2">
@@ -39,7 +41,7 @@ export function BottomNav() {
               href={tab.href}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300",
-                isActive ? "text-[#60A5FA]" : "text-slate-400 hover:text-slate-600"
+                isActive ? "text-[#60A5FA]" : "text-slate-500 hover:text-slate-700"
               )}
             >
               <div className={cn(

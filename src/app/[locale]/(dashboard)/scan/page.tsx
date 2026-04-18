@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Shield, Zap, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { useTranslations } from 'next-intl';
 import { useUserStore } from '@/store/useUserStore'
 import { runScan, recordScanOnChain } from '@/lib/ai/scanEngine'
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,7 @@ const SCAN_DURATION = 8000 // 8 seconds
 
 export default function ScanPage() {
   const router = useRouter()
+  const t = useTranslations('App')
   const { user } = useUserStore()
   const [isScanning, setIsScanning] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -113,10 +115,10 @@ export default function ScanPage() {
       {/* Top Section */}
       <div className="w-full text-center">
         <h1 className="text-2xl font-black text-[#60A5FA] uppercase tracking-tighter mb-2">
-          {status === 'idle' ? 'Ready to Scan' : status === 'scanning' ? 'Scanning Water...' : 'AI Analysis...'}
+          {status === 'idle' ? t('readyToScan') : status === 'scanning' ? t('scanningWater') : t('aiAnalysis')}
         </h1>
         <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">
-          {status === 'idle' ? 'Place Pod in water sample' : 'Keep device submerged'}
+          {status === 'idle' ? t('placePod') : t('keepSubmerged')}
         </p>
       </div>
 
@@ -179,12 +181,12 @@ export default function ScanPage() {
         {status === 'idle' ? (
           !isConnected ? (
             <div className="space-y-4 text-center">
-               <p className="text-red-500 font-bold uppercase tracking-widest text-sm">Hardware Disconnected</p>
+               <p className="text-red-500 font-bold uppercase tracking-widest text-sm">{t('hardwareDisconnected')}</p>
                <Button 
                 asChild
                 className="w-full h-20 bg-amber-500 hover:bg-amber-600 text-white font-black text-xl rounded-full shadow-lg uppercase tracking-tighter"
                >
-                 <Link href="/hardware">Connect Device</Link>
+                 <Link href="/hardware">{t('connectDevice')}</Link>
                </Button>
             </div>
           ) : (
@@ -192,7 +194,7 @@ export default function ScanPage() {
               onClick={handleStartScan}
               className="w-full h-20 bg-[#60A5FA] hover:bg-[#3B82F6] text-white font-black text-xl rounded-full shadow-2xl shadow-blue-100 uppercase tracking-tighter"
             >
-              Start Scan
+              {t('startScan')}
             </Button>
           )
         ) : status === 'error' ? (
@@ -203,7 +205,7 @@ export default function ScanPage() {
               variant="outline"
               className="w-full h-14 border-red-200 text-red-500 font-bold rounded-full"
             >
-              Try Again
+              {t('tryAgain')}
             </Button>
           </div>
         ) : (
@@ -211,7 +213,7 @@ export default function ScanPage() {
             <Progress value={progress} className="h-3 bg-slate-100" />
             <p className="text-[10px] text-center font-bold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
               <Loader2 size={12} className="animate-spin text-[#60A5FA]" />
-              {status === 'scanning' ? 'Connecting to spectral pod...' : 'AI computing adulterants...'}
+              {status === 'scanning' ? t('connectingPod') : t('aiComputing')}
             </p>
           </div>
         )}
@@ -219,11 +221,11 @@ export default function ScanPage() {
         <div className="flex items-center justify-center gap-6 text-slate-400">
            <div className="flex items-center gap-1">
              <CheckCircle2 size={14} className="text-[#60A5FA]" />
-             <span className="text-[10px] font-bold uppercase tracking-wider italic">FSSAI Compliant</span>
+             <span className="text-[10px] font-bold uppercase tracking-wider italic">{t('fssaiCompliant')}</span>
            </div>
            <div className="flex items-center gap-1">
              <CheckCircle2 size={14} className="text-[#60A5FA]" />
-             <span className="text-[10px] font-bold uppercase tracking-wider italic">Cloud Verified</span>
+             <span className="text-[10px] font-bold uppercase tracking-wider italic">{t('cloudVerified')}</span>
            </div>
         </div>
       </div>

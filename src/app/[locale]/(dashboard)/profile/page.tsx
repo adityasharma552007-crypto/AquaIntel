@@ -3,8 +3,10 @@ export const dynamic = 'force-dynamic'
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import ProfileClient from "./ProfileClient"
+import { setRequestLocale } from "next-intl/server"
 
-export default async function ProfilePage() {
+export default async function ProfilePage({ params: { locale } }: { params: { locale: string } }) {
+  setRequestLocale(locale);
   const supabase = createClient()
   
   const { data: { user }, error: userError } = await supabase.auth.getUser()

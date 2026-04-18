@@ -14,6 +14,7 @@ import {
 import Link from "next/link"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from "date-fns"
 import { cn } from "@/lib/utils"
+import { getTranslations, setRequestLocale } from "next-intl/server"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -21,8 +22,10 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import HistoryTrendChart from "@/components/HistoryTrendChart"
 
-export default async function HistoryPage() {
+export default async function HistoryPage({ params: { locale } }: { params: { locale: string } }) {
+  setRequestLocale(locale);
   const supabase = createClient()
+  const t = await getTranslations('App');
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return null
@@ -63,7 +66,7 @@ export default async function HistoryPage() {
           <Link href="/home" className="p-2 bg-white rounded-full shadow-sm">
             <ChevronLeft size={20} className="text-[#60A5FA]" />
           </Link>
-          <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">Scan History</h1>
+          <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">{t('scanHistory')}</h1>
           <div className="p-2 bg-white rounded-full shadow-sm opacity-0 pointer-events-none">
              <SlidersHorizontal size={20} />
           </div>

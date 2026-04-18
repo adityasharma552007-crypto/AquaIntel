@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { SignOutButton } from "./SignOutButton"
 import { BottomSheet } from "@/components/ui/BottomSheet"
+import { useTranslations } from "next-intl"
 
 interface ProfileClientProps {
   user: {
@@ -37,6 +38,7 @@ interface ProfileClientProps {
 export default function ProfileClient({ user, reports }: ProfileClientProps) {
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslations('App')
   
   // States
   const [isEditing, setIsEditing] = useState(false)
@@ -100,7 +102,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
     <div className="min-h-screen bg-[#F7F9F8] pb-32">
       {/* Header Bar */}
       <header className="flex items-center justify-center p-6 pb-4 bg-[#F7F9F8]">
-        <h1 className="text-lg font-bold text-[#60A5FA]">My Profile</h1>
+        <h1 className="text-lg font-bold text-[#60A5FA]">{t('myProfile')}</h1>
       </header>
 
       <main className="px-4 space-y-4">
@@ -177,22 +179,22 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
         <div className="flex justify-between gap-3 pt-2">
           <Card className="flex-1 rounded-[24px] border-none shadow-sm py-5 flex flex-col items-center justify-center bg-white">
             <span className="text-[22px] font-black text-slate-900 leading-none">{user.totalScans}</span>
-            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">TOTAL SCANS</span>
+            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">{t('totalScansL')}</span>
           </Card>
           <Card className="flex-1 rounded-[24px] border-none shadow-sm py-5 flex flex-col items-center justify-center bg-white">
             <span className="text-[22px] font-black text-[#60A5FA] leading-none">{user.safeScans}</span>
-            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">SAFE</span>
+            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">{t('safeL')}</span>
           </Card>
           <Card className="flex-1 rounded-[24px] border-none shadow-sm py-5 flex flex-col items-center justify-center bg-white">
             <span className="text-[22px] font-black text-[#D32F2F] leading-none">{user.unsafeScans}</span>
-            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">UNSAFE</span>
+            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">{t('unsafeL')}</span>
           </Card>
         </div>
 
         {/* Authority Reports */}
         <section className="mt-8">
           <div className="flex items-center justify-between px-2 mb-4">
-            <h3 className="font-bold text-slate-900 text-lg">My Authority Reports 📋</h3>
+            <h3 className="font-bold text-slate-900 text-lg">{t('myAuthorityReports')}</h3>
             <button className="text-[13px] font-bold text-[#60A5FA] hover:underline">View All</button>
           </div>
           <div className="space-y-3">
@@ -239,7 +241,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
         {/* Account Settings */}
         <section className="mt-10">
           <div className="flex items-center px-6 py-2 mb-2">
-            <h3 className="font-bold text-slate-900 text-lg">Account Settings ⚙️</h3>
+            <h3 className="font-bold text-slate-900 text-lg">{t('accountSettings')}</h3>
           </div>
           <Card className="rounded-[32px] border-none shadow-sm bg-white overflow-hidden pb-2 mx-1">
             <div className="flex flex-col pt-2">

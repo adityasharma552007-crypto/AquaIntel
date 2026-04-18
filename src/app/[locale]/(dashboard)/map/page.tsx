@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Search, MapPin, SlidersHorizontal, ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import nextDynamic from "next/dynamic"
+import { getTranslations, setRequestLocale } from "next-intl/server"
 
 // Dynamic import for Leaflet (Client-side only)
 const WaterMap = nextDynamic(() => import("@/components/WaterMap"), { 
@@ -11,8 +12,10 @@ const WaterMap = nextDynamic(() => import("@/components/WaterMap"), {
   loading: () => <div className="w-full h-full bg-slate-100 animate-pulse rounded-3xl flex items-center justify-center font-black text-slate-300 uppercase tracking-widest">Loading Map...</div>
 })
 
-export default async function MapPage({ searchParams }: { searchParams: { filter?: string } }) {
+export default async function MapPage({ params: { locale }, searchParams }: { params: { locale: string }, searchParams: { filter?: string } }) {
+  setRequestLocale(locale);
   const supabase = createClient()
+  const t = await getTranslations('App');
 
   const { data: { user } } = await supabase.auth.getUser()
   let cityName = 'Jaipur'
@@ -52,8 +55,8 @@ export default async function MapPage({ searchParams }: { searchParams: { filter
             <ChevronLeft size={20} className="text-[#60A5FA]" />
           </Link>
           <div className="flex flex-col items-center">
-            <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">Water Contamination Map</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{cityName} Area</p>
+            <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">{t('waterMap')}</h1>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{cityName} {t('area')}</p>
           </div>
           <div className="p-2 bg-slate-100 rounded-full">
              <SlidersHorizontal size={20} className="text-[#60A5FA]" />
@@ -63,15 +66,15 @@ export default async function MapPage({ searchParams }: { searchParams: { filter
         {/* Global Map Stats Top Bar */}
         <div className="grid grid-cols-3 gap-2 mt-2">
             <div className="bg-slate-50 p-3 rounded-2xl text-center">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Sources</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('sources')}</p>
                 <p className="text-lg font-black text-slate-800 leading-none">{totalSources}</p>
             </div>
             <div className="bg-[#60A5FA]/10 p-3 rounded-2xl text-center">
-                <p className="text-[10px] font-bold text-[#60A5FA] uppercase tracking-widest mb-1">% Safe</p>
+                <p className="text-[10px] font-bold text-[#60A5FA] uppercase tracking-widest mb-1">{t('safe')}</p>
                 <p className="text-lg font-black text-[#60A5FA] leading-none">{safePct}%</p>
             </div>
             <div className="bg-red-50 p-3 rounded-2xl text-center">
-                <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">% Hazard</p>
+                <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">{t('hazard')}</p>
                 <p className="text-lg font-black text-red-500 leading-none">{contamPct}%</p>
             </div>
         </div>
@@ -80,7 +83,7 @@ export default async function MapPage({ searchParams }: { searchParams: { filter
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <input 
             type="text" 
-            placeholder={`Search ${cityName} area or vendor...`} 
+            placeholder={t('searchArea', {city: cityName})} 
             className="w-full h-12 bg-slate-50 border-none rounded-2xl pl-10 pr-4 text-sm font-bold focus:ring-[#60A5FA]"
           />
         </div>

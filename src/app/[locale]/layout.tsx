@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import NextTopLoader from "nextjs-toploader";
 import {NextIntlClientProvider} from 'next-intl';
-import {getMessages} from 'next-intl/server';
+import {getMessages, setRequestLocale} from 'next-intl/server';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -191,6 +191,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: {locale: string};
 }>) {
+  setRequestLocale(locale);
   const messages = await getMessages();
   return (
     <html lang={locale}>
@@ -223,7 +224,7 @@ export default async function RootLayout({
           speed={200}
           shadow="0 0 10px #60A5FA,0 0 5px #60A5FA"
         />
-        <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
         </NextIntlClientProvider>
         <Toaster position="top-center" richColors />

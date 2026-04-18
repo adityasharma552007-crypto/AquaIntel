@@ -1,6 +1,60 @@
 {
-  "Common": {
-    "welcome": "Welcome to AquaIntel",
-    "dashboard": "Dashboard"
+  "Navigation": {
+    "home": "Home",
+    "scan": "Scan",
+    "map": "Map",
+    "history": "History",
+    "profile": "Profile"
+  },
+  "Dashboard": {
+    "welcomeBack": "Welcome back",
+    "user": "User",
+    "askAi": "Ask AI",
+    "communityAlert": "Community Alert",
+    "flaggedVendors": "⚠️ {count} vendors in your area are flagged",
+    "aiInsights": "AI Insights",
+    "newBadge": "New",
+    "cityRisk": "City-wide Risk Analysis",
+    "aiActive": "AI Active",
+    "scanWaterNow": "Scan Your Water Now",
+    "verifyPurity": "Verify purity in 8 seconds using AI spectral analysis.",
+    "startScanning": "START SCANNING",
+    "totalScans": "Total Scans",
+    "safeWater": "Safe Water",
+    "recentActivity": "Recent Activity",
+    "viewAll": "View All",
+    "homeSample": "Home Sample",
+    "safety": "Safety",
+    "noScansYet": "No scans yet",
+    "startFirstScan": "Start your first scan to see results"
+  },
+  "App": {
+    "readyToScan": "Ready to Scan",
+    "scanningWater": "Scanning Water...",
+    "aiAnalysis": "AI Analysis...",
+    "placePod": "Place Pod in water sample",
+    "keepSubmerged": "Keep device submerged",
+    "hardwareDisconnected": "Hardware Disconnected",
+    "connectDevice": "Connect Device",
+    "startScan": "Start Scan",
+    "tryAgain": "Try Again",
+    "connectingPod": "Connecting to spectral pod...",
+    "aiComputing": "AI computing adulterants...",
+    "fssaiCompliant": "FSSAI Compliant",
+    "cloudVerified": "Cloud Verified",
+    "waterMap": "Water Contamination Map",
+    "area": "Area",
+    "sources": "Sources",
+    "safe": "% Safe",
+    "hazard": "% Hazard",
+    "searchArea": "Search {city} area or vendor...",
+    "scanHistory": "Scan History",
+    "yourScans": "Your Scans",
+    "myProfile": "My Profile",
+    "totalScansL": "TOTAL SCANS",
+    "safeL": "SAFE",
+    "unsafeL": "UNSAFE",
+    "myAuthorityReports": "My Authority Reports 📋",
+    "accountSettings": "Account Settings ⚙️"
   }
 }

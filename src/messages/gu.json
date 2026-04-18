@@ -1,6 +1,60 @@
 {
-  "Common": {
-    "welcome": "AquaIntel માં તમારું સ્વાગત છે",
-    "dashboard": "ડેશબોર્ડ"
+  "Navigation": {
+    "home": "મુખપૃષ્ઠ",
+    "scan": "સ્કેન",
+    "map": "નકશો",
+    "history": "ઇતિહાસ",
+    "profile": "પ્રોફાઇલ"
+  },
+  "Dashboard": {
+    "welcomeBack": "પરત સ્વાગત છે",
+    "user": "વપરાશકર્તા",
+    "askAi": "Ask AI",
+    "communityAlert": "સામુદાયિક ચેતવણી",
+    "flaggedVendors": "⚠️ તમારા વિસ્તારમાં {count} વિક્રેતાઓ ફ્લેગ કરાયા છે",
+    "aiInsights": "AI આંતરદૃષ્ટિ",
+    "newBadge": "નવું",
+    "cityRisk": "શહેર-વ્યાપી જોખમ વિશ્લેષણ",
+    "aiActive": "AI સક્રિય",
+    "scanWaterNow": "હવે તમારું પાણી સ્કેન કરો",
+    "verifyPurity": "AI સ્પેક્ટ્રલ વિશ્લેષણનો ઉપયોગ કરીને 8 સેકન્ડમાં શુદ્ધતા ચકાસો.",
+    "startScanning": "સ્કેનિંગ શરૂ કરો",
+    "totalScans": "કુલ સ્કેન",
+    "safeWater": "સુરક્ષિત પાણી",
+    "recentActivity": "તાજેતરની પ્રવૃત્તિ",
+    "viewAll": "બધા જુઓ",
+    "homeSample": "હોમ સેમ્પલ",
+    "safety": "સલામતી",
+    "noScansYet": "હજી સુધી કોઈ સ્કેન નથી",
+    "startFirstScan": "પરિણામો જોવા માટે તમારું પ્રથમ સ્કેન શરૂ કરો"
+  },
+  "App": {
+    "readyToScan": "સ્કેન માટે તૈયાર",
+    "scanningWater": "પાણીનું સ્કેનિંગ...",
+    "aiAnalysis": "AI વિશ્લેષણ...",
+    "placePod": "પોડને પાણીમાં મૂકો",
+    "keepSubmerged": "ઉપકરણને ડૂબાડેલું રાખો",
+    "hardwareDisconnected": "હાર્ડવેર ડિસ્કનેક્ટ થયું",
+    "connectDevice": "ઉપકરણ કનેક્ટ કરો",
+    "startScan": "સ્કેન શરૂ કરો",
+    "tryAgain": "ફરી પ્રયાસ કરો",
+    "connectingPod": "સ્પેક્ટ્રલ પોડ સાથે કનેક્ટ થઈ રહ્યું છે...",
+    "aiComputing": "AI ભેળસેળની ગણતરી કરી રહ્યું છે...",
+    "fssaiCompliant": "FSSAI સુસંગત",
+    "cloudVerified": "ક્લાઉડ ચકાસાયેલ",
+    "waterMap": "જળ પ્રદૂષણ નકશો",
+    "area": "વિસ્તાર",
+    "sources": "સ્ત્રોતો",
+    "safe": "% સલામત",
+    "hazard": "% જોખમ",
+    "searchArea": "{city} વિસ્તાર અથવા વિક્રેતા શોધો...",
+    "scanHistory": "સ્કેન ઇતિહાસ",
+    "yourScans": "તમારા સ્કેન",
+    "myProfile": "મારી પ્રોફાઇલ",
+    "totalScansL": "કુલ સ્કેન",
+    "safeL": "સલામત",
+    "unsafeL": "અસુરક્ષિત",
+    "myAuthorityReports": "મારા સત્તાવાર અહેવાલો 📋",
+    "accountSettings": "એકાઉન્ટ સેટિંગ્સ ⚙️"
   }
 }
