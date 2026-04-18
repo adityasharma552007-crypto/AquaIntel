@@ -1,12 +1,26 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import createMiddleware from 'next-intl/middleware';
+
+const intlMiddleware = createMiddleware({
+  locales: ['en', 'hi', 'mr', 'gu', 'ta'],
+  defaultLocale: 'en',
+  localePrefix: 'as-needed'
+});
+
+const locales = ['/hi', '/mr', '/gu', '/ta'];
+
+const getPathWithoutLocale = (pathname: string) => {
+  for (const locale of locales) {
+    if (pathname === locale || pathname.startsWith(`${locale}/`)) {
+      return pathname.replace(locale, '') || '/';
+    }
+  }
+  return pathname;
+};
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+  let response = intlMiddleware(request);
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,11 +36,6 @@ export async function middleware(request: NextRequest) {
             value,
             ...options,
           })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
           response.cookies.set({
             name,
             value,
@@ -38,11 +47,6 @@ export async function middleware(request: NextRequest) {
             name,
             value: '',
             ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
           })
           response.cookies.set({
             name,
@@ -57,10 +61,11 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
+  const pathWithoutLocale = getPathWithoutLocale(pathname);
 
   // Public routes — never redirect to login
-  const isLandingPage = pathname === '/'
-  const isAuthPage = pathname.startsWith('/auth')
+  const isLandingPage = pathWithoutLocale === '/'
+  const isAuthPage = pathWithoutLocale.startsWith('/auth')
   const isPublicRoute = isLandingPage || isAuthPage
 
   // 1. Landing page — always let through (server component handles logged-in redirect to /home)
@@ -69,16 +74,18 @@ export async function middleware(request: NextRequest) {
   }
 
   // 2. Auth pages — if already logged in, go to /home (except profile completion)
-  const isProfileCompletion = pathname === '/auth/complete-profile';
+  const isProfileCompletion = pathWithoutLocale === '/auth/complete-profile';
   if (isAuthPage && user && !isProfileCompletion) {
-    return NextResponse.redirect(new URL('/home', request.url))
+    const localePrefix = pathname.substring(0, pathname.length - pathWithoutLocale.length);
+    return NextResponse.redirect(new URL(`${localePrefix}/home`.replace('//', '/'), request.url))
   }
 
   // 3. Protected dashboard routes — redirect to login if not authenticated
   const protectedPaths = ['/home', '/scan', '/chat', '/map', '/history', '/profile', '/learn']
-  const isProtected = protectedPaths.some(path => pathname.startsWith(path))
+  const isProtected = protectedPaths.some(path => pathWithoutLocale.startsWith(path))
   if (isProtected && !user) {
-    return NextResponse.redirect(new URL('/auth/login', request.url))
+    const localePrefix = pathname.substring(0, pathname.length - pathWithoutLocale.length);
+    return NextResponse.redirect(new URL(`${localePrefix}/auth/login`.replace('//', '/'), request.url))
   }
 
   return response
@@ -86,13 +93,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next|_vercel|.*\\..*).*)',
   ],
 }

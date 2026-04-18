@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import NextTopLoader from "nextjs-toploader";
+import {NextIntlClientProvider} from 'next-intl';
+import {getMessages} from 'next-intl/server';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -182,13 +184,16 @@ const organizationJsonLd = {
   areaServed: "IN",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params: {locale}
 }: Readonly<{
   children: React.ReactNode;
+  params: {locale: string};
 }>) {
+  const messages = await getMessages();
   return (
-    <html lang="en">
+    <html lang={locale}>
       <head>
         {/* JSON-LD Structured Data for SEO */}
         <script
@@ -218,7 +223,9 @@ export default function RootLayout({
           speed={200}
           shadow="0 0 10px #60A5FA,0 0 5px #60A5FA"
         />
-        {children}
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
         <Toaster position="top-center" richColors />
       </body>
     </html>
