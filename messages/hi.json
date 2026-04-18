@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "होम",
+    "dashboard": "डैशबोर्ड",
+    "hardware": "हार्डवेयर मॉनिटर",
+    "map": "प्रदूषण मानचित्र",
+    "reports": "रिपोर्ट",
+    "community": "समुदाय",
+    "chatbot": "AI सहायक"
+  },
+  "hero": {
+    "title": "AquaIntel",
+    "subtitle": "रियल-टाइम जल प्रदूषण पहचान",
+    "description": "AI और ब्लॉकचेन द्वारा संचालित उन्नत स्पेक्ट्रल विश्लेषण",
+    "scanButton": "स्कैन शुरू करें",
+    "learnMore": "अधिक जानें"
+  },
+  "scan": {
+    "title": "लाइव जल स्कैन",
+    "status_pure": "शुद्ध जल",
+    "status_contaminated": "प्रदूषित",
+    "status_uncertain": "अनिश्चित",
+    "quality": "गुणवत्ता स्कोर",
+    "cod": "COD अनुमान",
+    "timestamp": "स्कैन समय",
+    "blockchain": "ब्लॉकचेन पर दर्ज",
+    "waiting": "रीडिंग का इंतजार...",
+    "connected": "ESP32 कनेक्टेड — लाइव",
+    "waiting_device": "डिवाइस का इंतजार...",
+    "offline": "डिवाइस ऑफलाइन"
+  },
+  "map": {
+    "title": "जल प्रदूषण मानचित्र",
+    "safe": "सुरक्षित",
+    "contaminated": "प्रदूषित",
+    "borderline": "सीमारेखा",
+    "total": "कुल स्रोत",
+    "percent_safe": "सुरक्षित",
+    "percent_contaminated": "प्रदूषित"
+  },
+  "chatbot": {
+    "title": "AI जल गुणवत्ता सहायक",
+    "placeholder": "जल गुणवत्ता के बारे में पूछें...",
+    "send": "भेजें"
+  },
+  "reports": {
+    "title": "जल गुणवत्ता रिपोर्ट",
+    "generate": "रिपोर्ट बनाएं",
+    "download": "PDF डाउनलोड करें"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "कुछ गलत हुआ",
+    "retry": "पुनः प्रयास",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "close": "बंद करें"
+  }
+}

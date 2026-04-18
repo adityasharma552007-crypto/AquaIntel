@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "मुख्यपृष्ठ",
+    "dashboard": "डॅशबोर्ड",
+    "hardware": "हार्डवेअर मॉनिटर",
+    "map": "प्रदूषण नकाशा",
+    "reports": "अहवाल",
+    "community": "समुदाय",
+    "chatbot": "AI सहाय्यक"
+  },
+  "hero": {
+    "title": "AquaIntel",
+    "subtitle": "रिअल-टाइम पाणी प्रदूषण शोध",
+    "description": "AI आणि ब्लॉकचेनवर चालणारे प्रगत स्पेक्ट्रल विश्लेषण",
+    "scanButton": "स्कॅन सुरू करा",
+    "learnMore": "अधिक जाणून घ्या"
+  },
+  "scan": {
+    "title": "थेट पाणी स्कॅन",
+    "status_pure": "शुद्ध पाणी",
+    "status_contaminated": "प्रदूषित",
+    "status_uncertain": "अनिश्चित",
+    "quality": "गुणवत्ता गुण",
+    "cod": "COD अंदाज",
+    "timestamp": "स्कॅन वेळ",
+    "blockchain": "ब्लॉकचेनवर नोंदवले",
+    "waiting": "रीडिंगची प्रतीक्षा...",
+    "connected": "ESP32 जोडलेले — थेट",
+    "waiting_device": "डिव्हाइसची प्रतीक्षा...",
+    "offline": "डिव्हाइस ऑफलाइन"
+  },
+  "map": {
+    "title": "पाणी प्रदूषण नकाशा",
+    "safe": "सुरक्षित",
+    "contaminated": "प्रदूषित",
+    "borderline": "सीमारेषा",
+    "total": "एकूण स्रोत",
+    "percent_safe": "सुरक्षित",
+    "percent_contaminated": "प्रदूषित"
+  },
+  "chatbot": {
+    "title": "AI पाणी गुणवत्ता सहाय्यक",
+    "placeholder": "पाण्याच्या गुणवत्तेबद्दल विचारा...",
+    "send": "पाठवा"
+  },
+  "reports": {
+    "title": "पाणी गुणवत्ता अहवाल",
+    "generate": "अहवाल तयार करा",
+    "download": "PDF डाउनलोड करा"
+  },
+  "common": {
+    "loading": "लोड होत आहे...",
+    "error": "काहीतरी चुकले",
+    "retry": "पुन्हा प्रयत्न करा",
+    "save": "जतन करा",
+    "cancel": "रद्द करा",
+    "close": "बंद करा"
+  }
+}

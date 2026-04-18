@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let body: { messages: { role: string; content: string }[]; context?: string }
+  let body: { messages: { role: string; content: string }[]; context?: string; locale?: string }
   try {
     body = await req.json()
   } catch {
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  const { messages, context } = body
+  const { messages, context, locale } = body
 
   if (!messages || !Array.isArray(messages)) {
     return new Response(JSON.stringify({ error: 'messages array is required' }), {
@@ -68,9 +68,18 @@ export async function POST(req: NextRequest) {
   }
 
   // Build the system message — optionally inject scan context
+  const localeLanguageMap: Record<string, string> = {
+    en: 'English',
+    hi: 'Hindi',
+    mr: 'Marathi',
+    gu: 'Gujarati',
+    ta: 'Tamil'
+  };
+  const replyLanguage = localeLanguageMap[locale || 'en'] || 'English';
+  const localeInstruction = `Always respond in ${replyLanguage}.`;
   const systemContent = context
-    ? `${SYSTEM_PROMPT}\n\nCurrent scan context:\n${context}`
-    : SYSTEM_PROMPT
+    ? `${SYSTEM_PROMPT}\n\n${localeInstruction}\n\nCurrent scan context:\n${context}`
+    : `${SYSTEM_PROMPT}\n\n${localeInstruction}`;
 
   try {
     const groqClient = new Groq({ apiKey })

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Search, MapPin, SlidersHorizontal, ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import nextDynamic from "next/dynamic"
+import { getTranslations } from "next-intl/server"
 
 // Dynamic import for Leaflet (Client-side only)
 const WaterMap = nextDynamic(() => import("@/components/WaterMap"), { 
@@ -12,6 +13,7 @@ const WaterMap = nextDynamic(() => import("@/components/WaterMap"), {
 })
 
 export default async function MapPage({ searchParams }: { searchParams: { filter?: string } }) {
+  const t = await getTranslations('map')
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -52,7 +54,7 @@ export default async function MapPage({ searchParams }: { searchParams: { filter
             <ChevronLeft size={20} className="text-[#60A5FA]" />
           </Link>
           <div className="flex flex-col items-center">
-            <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">Water Contamination Map</h1>
+            <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">{t('title')}</h1>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{cityName} Area</p>
           </div>
           <div className="p-2 bg-slate-100 rounded-full">
@@ -63,15 +65,15 @@ export default async function MapPage({ searchParams }: { searchParams: { filter
         {/* Global Map Stats Top Bar */}
         <div className="grid grid-cols-3 gap-2 mt-2">
             <div className="bg-slate-50 p-3 rounded-2xl text-center">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Sources</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{t('total')}</p>
                 <p className="text-lg font-black text-slate-800 leading-none">{totalSources}</p>
             </div>
             <div className="bg-[#60A5FA]/10 p-3 rounded-2xl text-center">
-                <p className="text-[10px] font-bold text-[#60A5FA] uppercase tracking-widest mb-1">% Safe</p>
+                <p className="text-[10px] font-bold text-[#60A5FA] uppercase tracking-widest mb-1">% {t('percent_safe')}</p>
                 <p className="text-lg font-black text-[#60A5FA] leading-none">{safePct}%</p>
             </div>
             <div className="bg-red-50 p-3 rounded-2xl text-center">
-                <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">% Hazard</p>
+                <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">% {t('percent_contaminated')}</p>
                 <p className="text-lg font-black text-red-500 leading-none">{contamPct}%</p>
             </div>
         </div>

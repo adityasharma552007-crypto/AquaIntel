@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "home": "હોમ",
+    "dashboard": "ડેશબોર્ડ",
+    "hardware": "હાર્ડવેર મોનીટર",
+    "map": "પ્રદૂષણ નકશો",
+    "reports": "રિપોર્ટ્સ",
+    "community": "સમુદાય",
+    "chatbot": "AI સહાયક"
+  },
+  "hero": {
+    "title": "AquaIntel",
+    "subtitle": "રિયલ-ટાઈમ પાણી પ્રદૂષણ શોધ",
+    "description": "AI અને બ્લોકચેઇનથી સંચાલિત અદ્યતન સ્પેક્ટ્રલ વિશ્લેષણ",
+    "scanButton": "સ્કેન શરૂ કરો",
+    "learnMore": "વધુ જાણો"
+  },
+  "scan": {
+    "title": "લાઈવ પાણી સ્કેન",
+    "status_pure": "શુદ્ધ પાણી",
+    "status_contaminated": "પ્રદૂષિત",
+    "status_uncertain": "અનિશ્ચિત",
+    "quality": "ગુણવત્તા સ્કોર",
+    "cod": "COD અંદાજ",
+    "timestamp": "સ્કેન સમય",
+    "blockchain": "બ્લોકચેઇનમાં નોંધાયેલ",
+    "waiting": "રીડિંગની રાહમાં...",
+    "connected": "ESP32 જોડાયેલ — લાઈવ",
+    "waiting_device": "ડિવાઇસની રાહમાં...",
+    "offline": "ડિવાઇસ ઑફલાઇન"
+  },
+  "map": {
+    "title": "પાણી પ્રદૂષણ નકશો",
+    "safe": "સુરક્ષિત",
+    "contaminated": "પ્રદૂષિત",
+    "borderline": "સીમારેખા",
+    "total": "કુલ સ્ત્રોતો",
+    "percent_safe": "સુરક્ષિત",
+    "percent_contaminated": "પ્રદૂષિત"
+  },
+  "chatbot": {
+    "title": "AI પાણી ગુણવત્તા સહાયક",
+    "placeholder": "પાણીની ગુણવત્તા વિશે પૂછો...",
+    "send": "મોકલો"
+  },
+  "reports": {
+    "title": "પાણી ગુણવત્તા રિપોર્ટ્સ",
+    "generate": "રિપોર્ટ બનાવો",
+    "download": "PDF ડાઉનલોડ કરો"
+  },
+  "common": {
+    "loading": "લોડ થઈ રહ્યું છે...",
+    "error": "કંઈક ખોટું થયું",
+    "retry": "ફરી પ્રયાસ કરો",
+    "save": "સાચવો",
+    "cancel": "રદ કરો",
+    "close": "બંધ કરો"
+  }
+}

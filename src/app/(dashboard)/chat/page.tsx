@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import GroqSetupGuide, { type GroqKeyReason } from '@/components/GroqSetupGuide'
+import { useLocale, useTranslations } from 'next-intl'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type Role = 'user' | 'assistant'
@@ -42,13 +43,14 @@ async function checkGroqStatus(): Promise<{ ok: boolean; reason: GroqKeyReason }
 
 async function streamChat(
   messages: { role: Role; content: string }[],
+  locale: string,
   onChunk: (text: string) => void,
   signal?: AbortSignal
 ): Promise<void> {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages }),
+    body: JSON.stringify({ messages, locale }),
     signal,
   })
 
@@ -168,6 +170,8 @@ const suggestions = [
 
 // ─── Main Chat Page ───────────────────────────────────────────────────────────
 export default function ChatPage() {
+  const locale = useLocale()
+  const tChat = useTranslations('chatbot')
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -229,7 +233,7 @@ export default function ChatPage() {
 
     abortRef.current = new AbortController()
     try {
-      await streamChat(history, chunk => {
+      await streamChat(history, locale, chunk => {
         setMessages(prev => prev.map(m => m.id === aiId ? { ...m, content: m.content + chunk } : m))
       }, abortRef.current.signal)
     } catch (err: any) {
@@ -269,7 +273,7 @@ export default function ChatPage() {
               <Bot size={20} />
             </div>
             <div>
-              <h1 className="font-black text-lg tracking-tight leading-none">AquaIntel AI</h1>
+              <h1 className="font-black text-lg tracking-tight leading-none">{tChat('title')}</h1>
               <p className="text-[10px] text-white/70 font-bold uppercase tracking-widest mt-0.5">
                 {isChecking
                   ? '● Connecting…'
@@ -421,7 +425,7 @@ export default function ChatPage() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isChecking ? 'Connecting…' : 'Ask about your water test results…'}
+              placeholder={isChecking ? 'Connecting…' : tChat('placeholder')}
               disabled={loading || isChecking || isDisabled}
               className="flex-1 resize-none bg-transparent text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none disabled:opacity-40 leading-relaxed"
             />

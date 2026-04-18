@@ -12,31 +12,35 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Scan, Map, History, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLocale, useTranslations } from 'next-intl'
 
 // Navigation tabs with SEO-friendly link structure
 // Each href is a crawlable internal link that helps search engine discovery
 const tabs = [
-  { name: 'Home',     href: '/home',     icon: Home,     label: 'Dashboard' },
-  { name: 'Scan',     href: '/scan',     icon: Scan,     label: 'Test Water' },
-  { name: 'Map',      href: '/map',      icon: Map,      label: 'Vendors' },
-  { name: 'History',  href: '/history',  icon: History,  label: 'Results' },
-  { name: 'Profile',  href: '/profile',  icon: User,     label: 'Account' },
+  { key: 'home', href: '/home', icon: Home },
+  { key: 'reports', href: '/scan', icon: Scan },
+  { key: 'map', href: '/map', icon: Map },
+  { key: 'dashboard', href: '/history', icon: History },
+  { key: 'community', href: '/profile', icon: User }
 ]
 
 export function BottomNav() {
+  const t = useTranslations('nav')
+  const locale = useLocale()
   const pathname = usePathname()
 
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center pointer-events-none px-2">
       <nav className="bg-white/90 backdrop-blur-md border border-slate-200/50 shadow-2xl rounded-[32px] h-20 w-full max-w-[480px] flex items-center justify-around px-2 pointer-events-auto">
         {tabs.map((tab) => {
-          const isActive = pathname === tab.href
+          const localizedHref = `/${locale}${tab.href}`
+          const isActive = pathname === localizedHref || pathname.endsWith(tab.href)
           const Icon = tab.icon
 
           return (
             <Link
-              key={tab.name}
-              href={tab.href}
+              key={tab.key}
+              href={localizedHref}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300",
                 isActive ? "text-[#60A5FA]" : "text-slate-400 hover:text-slate-600"
@@ -52,7 +56,7 @@ export function BottomNav() {
                 "text-[8px] font-black uppercase tracking-[0.06em]",
                 isActive ? "opacity-100" : "opacity-40"
               )}>
-                {tab.name}
+                {t(tab.key)}
               </span>
             </Link>
           )

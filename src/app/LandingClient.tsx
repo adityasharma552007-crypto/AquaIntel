@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Download } from 'lucide-react'
+import { useLocale, useTranslations } from 'next-intl'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -16,9 +17,11 @@ const fadeUp = {
 
 export default function LandingClient() {
   const router = useRouter()
+  const locale = useLocale()
+  const tHero = useTranslations('hero')
 
-  const goToLogin = () => router.push('/auth/login')
-  const goToDownload = () => router.push('/download')
+  const goToLogin = () => router.push(`/${locale}/auth/login`)
+  const goToDownload = () => router.push(`/${locale}/download`)
 
   return (
     <main
@@ -120,7 +123,7 @@ export default function LandingClient() {
             textAlign: 'center',
           }}
         >
-          AquaIntel
+          {tHero('title')}
         </motion.h1>
 
         {/* Tagline */}
@@ -139,7 +142,7 @@ export default function LandingClient() {
             letterSpacing: '0.1px',
           }}
         >
-          Safe Water. Scanned in Seconds.
+          {tHero('subtitle')}
         </motion.p>
 
         {/* Trust line */}
@@ -184,7 +187,7 @@ export default function LandingClient() {
               boxShadow: '0 4px 20px rgba(245,166,35,0.4)',
             }}
           >
-            Get Started →
+            {tHero('scanButton')} →
           </button>
           <button
             onClick={goToDownload}
@@ -207,7 +210,7 @@ export default function LandingClient() {
             }}
           >
             <Download size={18} />
-            Download APK
+            {tHero('learnMore')}
           </button>
         </motion.div>
 
