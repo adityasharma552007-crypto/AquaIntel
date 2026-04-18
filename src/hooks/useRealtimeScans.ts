@@ -23,6 +23,7 @@ export interface ScanRow {
   // Blockchain
   tx_hash?: string | null;
   channel_hash?: string | null;
+  cod_estimate?: number | null;
   created_at: string;
 }
 
@@ -68,7 +69,7 @@ export function useRealtimeScans() {
     const fetchInitial = async () => {
       const { data, error } = await supabase
         .from('water_data')
-        .select('id, f1, f2, f3, f4, f5, f6, f7, f8, nir, clear, quality, status, tx_hash, channel_hash, created_at')
+        .select('id, f1, f2, f3, f4, f5, f6, f7, f8, nir, clear, quality, status, tx_hash, channel_hash, cod_estimate, created_at')
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -106,6 +107,7 @@ export function useRealtimeScans() {
             quality: newScan.quality,
             status: derivedStatus,
             channelHash,
+            codEstimate: newScan.cod_estimate,
             created_at: newScan.created_at,
           }).catch(console.error);
         }

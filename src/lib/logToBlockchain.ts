@@ -9,6 +9,7 @@ export interface ScanData {
   quality: number;
   status: string;
   channelHash?: string; // SHA-256 hex of all 14 AS7343 channel values
+  codEstimate?: number | null; // COD in mg/L
   created_at: string;
 }
 
@@ -33,15 +34,16 @@ export async function logToBlockchain(scan: ScanData): Promise<string | null> {
     const wallet   = new ethers.Wallet(PRIVATE_KEY, provider);
     const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, wallet);
 
-    // Log: scan id, quality score (×100 as uint), status label, channel hash
+    // Log: scan id, quality score (×100 as uint), status label (appended with COD), channel hash
     // The Solidity function signature expected: logScan(string id, uint quality, string status, string channelHash)
     const qualityBasisPoints = Math.round(scan.quality * 100);
     const channelHash = scan.channelHash ?? '';
+    const formattedStatus = scan.codEstimate ? `${scan.status} | COD: ${scan.codEstimate.toFixed(1)}mg/L` : scan.status;
 
     const tx = await contract.logScan(
       scan.id,
       qualityBasisPoints,
-      scan.status,
+      formattedStatus,
       channelHash
     );
 

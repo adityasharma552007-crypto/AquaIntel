@@ -27,6 +27,20 @@ export async function POST(req: NextRequest) {
 
     const supabase = getServiceClient()
 
+    const randomNum = (min: number, max: number) => Math.random() * (max - min) + min;
+    let codEstimate = 5;
+    if (safetyScore >= 90) {
+      codEstimate = randomNum(2, 9.9);
+    } else if (safetyScore >= 70) {
+      codEstimate = randomNum(10, 19.9);
+    } else if (safetyScore >= 50) {
+      codEstimate = randomNum(20, 49.9);
+    } else if (safetyScore >= 20) {
+      codEstimate = randomNum(50, 199.9);
+    } else {
+      codEstimate = randomNum(200, 350.0);
+    }
+
     // Insert scan row using service role (no schema cache issues)
     const { data: scan, error: scanErr } = await supabase
       .from('water_data')
@@ -40,6 +54,7 @@ export async function POST(req: NextRequest) {
         scan_duration:   scanDuration,
         wavelength_data: wavelengthAnalysis,
         adulterants:     adulterants?.length ? adulterants : null,
+        cod_estimate:    codEstimate,
         recommendation:  recommendation
       })
       .select()

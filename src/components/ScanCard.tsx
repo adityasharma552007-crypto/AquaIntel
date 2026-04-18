@@ -60,6 +60,15 @@ const STATUS_CONFIG: Record<
   },
 }
 
+// ─── COD config ───────────────────────────────────────────────────────────────
+function getCodStatus(cod: number) {
+  if (cod < 10) return { label: 'Excellent', emoji: '✅', color: 'text-emerald-600', bg: 'bg-emerald-100' }
+  if (cod <= 20) return { label: 'Good', emoji: '🟡', color: 'text-lime-600', bg: 'bg-lime-100' }
+  if (cod <= 50) return { label: 'Moderate', emoji: '🟠', color: 'text-amber-600', bg: 'bg-amber-100' }
+  if (cod <= 200) return { label: 'Poor', emoji: '🔴', color: 'text-orange-600', bg: 'bg-orange-100' }
+  return { label: 'Critical', emoji: '⛔', color: 'text-red-700', bg: 'bg-red-100' }
+}
+
 // ─── Spectral bar ─────────────────────────────────────────────────────────────
 function SpectralBar({ scan }: { scan: ScanRow }) {
   const channels = [scan.f1, scan.f2, scan.f3, scan.f4, scan.f5, scan.f6, scan.f7, scan.f8].map(
@@ -157,15 +166,26 @@ export function ScanCard({ scan, index = 0 }: ScanCardProps) {
       {/* Spectral bar */}
       <SpectralBar scan={scan} />
 
-      {/* NIR + Clear secondary row */}
-      <div className="flex gap-2">
-        <div className="flex-1 rounded-2xl bg-white/80 border border-slate-100 px-3 py-1.5 text-center">
+      {/* Custom Secondary Row */}
+      <div className="flex gap-2 flex-wrap">
+        {scan.cod_estimate != null && (
+          <div className="flex-1 rounded-2xl bg-white/80 border border-slate-100 px-3 py-1.5 text-center flex flex-col items-center justify-center min-w-[70px]">
+            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">COD (mg/L)</p>
+            <p className="text-sm font-black text-slate-700 mb-0.5">
+              {scan.cod_estimate.toFixed(1)}
+            </p>
+            <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${getCodStatus(scan.cod_estimate).bg} ${getCodStatus(scan.cod_estimate).color}`}>
+               {getCodStatus(scan.cod_estimate).emoji} {getCodStatus(scan.cod_estimate).label}
+            </span>
+          </div>
+        )}
+        <div className="flex-1 rounded-2xl bg-white/80 border border-slate-100 px-3 py-1.5 text-center flex flex-col justify-center min-w-[50px]">
           <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">NIR</p>
           <p className="text-sm font-black text-slate-700">
             {scan.nir != null ? scan.nir.toFixed(0) : '—'}
           </p>
         </div>
-        <div className="flex-1 rounded-2xl bg-white/80 border border-slate-100 px-3 py-1.5 text-center">
+        <div className="flex-1 rounded-2xl bg-white/80 border border-slate-100 px-3 py-1.5 text-center flex flex-col justify-center min-w-[50px]">
           <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Clear</p>
           <p className="text-sm font-black text-slate-700">
             {scan.clear != null ? scan.clear.toFixed(0) : '—'}

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { homeMetadata } from "@/app/page.metadata"
+import CodTrendChart from "@/components/CodTrendChart"
 
 export const metadata: Metadata = homeMetadata
 
@@ -151,6 +152,11 @@ export default async function HomePage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* COD Trend Line Chart */}
+        <div className="space-y-4">
+          <CodTrendChart scans={scans as any} />
         </div>
 
         {/* Recent Scans */}

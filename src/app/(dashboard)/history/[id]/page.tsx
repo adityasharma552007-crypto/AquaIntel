@@ -70,6 +70,14 @@ export default async function ScanResultPage({
 
   const StatusIcon = tierIcons[result_tier as keyof typeof tierIcons];
 
+  const getCodStatus = (cod: number) => {
+    if (cod < 10) return { label: 'Excellent', emoji: '✅', color: 'text-emerald-600', bg: 'bg-emerald-100' }
+    if (cod <= 20) return { label: 'Good', emoji: '🟡', color: 'text-lime-600', bg: 'bg-lime-100' }
+    if (cod <= 50) return { label: 'Moderate', emoji: '🟠', color: 'text-amber-600', bg: 'bg-amber-100' }
+    if (cod <= 200) return { label: 'Poor', emoji: '🔴', color: 'text-orange-600', bg: 'bg-orange-100' }
+    return { label: 'Critical', emoji: '⛔', color: 'text-red-700', bg: 'bg-red-100' }
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F7F9F8]">
       {/* Top Banner */}
@@ -213,6 +221,28 @@ export default async function ScanResultPage({
                     <p className="text-[10px] text-slate-400">From scanner</p>
                   </div>
                 </div>
+                {scan.cod_estimate != null && (
+                  <div className="mt-3 bg-slate-50 rounded-xl p-4 flex items-center justify-between border border-slate-100">
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                        <Activity size={10} className="text-slate-400" />
+                        Chemical Oxygen Demand (COD)
+                      </p>
+                      <p className="text-2xl font-black text-slate-800">
+                        {scan.cod_estimate.toFixed(1)} <span className="text-xs font-bold text-slate-400">mg/L</span>
+                      </p>
+                    </div>
+                    <div className={cn(
+                      "px-3 py-1.5 rounded-full flex items-center gap-1 border",
+                      getCodStatus(scan.cod_estimate).bg,
+                      getCodStatus(scan.cod_estimate).color,
+                      "border-current/20"
+                    )}>
+                      <span className="text-sm">{getCodStatus(scan.cod_estimate).emoji}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">{getCodStatus(scan.cod_estimate).label}</span>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
         </div>
