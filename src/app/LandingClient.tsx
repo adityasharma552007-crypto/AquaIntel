@@ -79,17 +79,17 @@ export default function LandingClient() {
           animate="visible"
           variants={fadeUp}
           style={{
-            width: 88,
-            height: 88,
+            width: 96,
+            height: 96,
             borderRadius: 24,
-            background: 'rgba(255,255,255,1)',
+            background: 'rgba(255,255,255,0.05)',
             backdropFilter: 'blur(10px)',
-            border: '1.5px solid rgba(255,255,255,0.25)',
+            border: '1px solid rgba(255,255,255,0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: 28,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
             position: 'relative',
             overflow: 'hidden',
           }}
@@ -97,8 +97,8 @@ export default function LandingClient() {
           <Image
             src="/logo.png"
             alt="AquaIntel Logo"
-            width={70}
-            height={70}
+            width={80}
+            height={80}
             priority
             style={{ objectFit: 'contain' }}
           />

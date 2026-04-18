@@ -33,11 +33,14 @@ export async function POST(req: NextRequest) {
       .insert({
         user_id:         user.id,
         safety_score:    safetyScore,
+        quality:         safetyScore / 100, // Sync the quality metric for frontend compatibility
         result_tier:     resultTier,
+        status:          recommendation.split('.')[0] || 'Processed', // Give it a basic status
         ai_confidence:   aiConfidence,
         scan_duration:   scanDuration,
         wavelength_data: wavelengthAnalysis,
-        adulterants:     adulterants?.length ? adulterants : null
+        adulterants:     adulterants?.length ? adulterants : null,
+        recommendation:  recommendation
       })
       .select()
       .single()

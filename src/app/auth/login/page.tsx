@@ -89,8 +89,8 @@ export default function LoginPage() {
       <Card className="w-full max-w-[400px] border-none shadow-sm rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-8 flex flex-col items-center">
           {/* Logo */}
-          <div className="w-20 h-20 mb-4 relative overflow-hidden">
-             <Image src="/logo.png" alt="AquaIntel Logo" width={80} height={80} style={{ objectFit: 'contain' }} priority />
+          <div className="w-20 h-20 mb-4 bg-white/5 border border-slate-100 backdrop-blur-md rounded-2xl flex items-center justify-center relative overflow-hidden shadow-xl">
+             <Image src="/logo.png" alt="AquaIntel Logo" width={64} height={64} style={{ objectFit: 'contain' }} priority />
           </div>
           <h2 className="text-2xl font-bold text-[#60A5FA] mb-8">AquaIntel</h2>
 

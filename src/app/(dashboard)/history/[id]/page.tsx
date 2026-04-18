@@ -49,7 +49,7 @@ export default async function ScanResultPage({
 
   // mock backwards compatibility mapping
   const vendorTrust = null
-  const safety_score = Math.round((scan.quality || 0) * 100)
+  const safety_score = scan.safety_score ?? Math.round((scan.quality || 0) * 100)
   let result_tier = 'danger'
   if (safety_score >= 80) result_tier = 'safe'
   else if (safety_score >= 50) result_tier = 'warning'
@@ -193,7 +193,7 @@ export default async function ScanResultPage({
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-slate-50 rounded-xl p-3">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Water Quality</p>
-                    <p className="text-2xl font-black text-slate-800">{(scan.quality || 0).toFixed(3)}</p>
+                    <p className="text-2xl font-black text-slate-800">{(scan.quality ?? (scan.safety_score ? scan.safety_score / 100 : 0)).toFixed(3)}</p>
                   </div>
                   <div className="bg-slate-50 rounded-xl p-3">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
@@ -207,7 +207,7 @@ export default async function ScanResultPage({
 
         {/* FSSAI Notice & Report Generator */}
         <div className="space-y-3">
-          <WaterReportModal scan={scan} defaultOpen={showReport} />
+          <WaterReportModal scan={scan} />
           <Button variant="ghost" className="w-full text-slate-400 font-bold text-[10px] uppercase tracking-widest print:hidden">
            Terms of Service & Regulatory Basis
           </Button>

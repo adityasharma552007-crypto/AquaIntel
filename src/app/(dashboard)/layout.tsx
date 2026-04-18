@@ -5,6 +5,7 @@ import { UserHydrator } from '@/components/common/UserHydrator'
 import { BottomNav } from '@/components/common/BottomNav'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Smartphone, Download } from 'lucide-react'
 
 export default async function DashboardLayout({
@@ -33,8 +34,8 @@ export default async function DashboardLayout({
         {/* Global Dashboard Header with Download CTA */}
         <div className="w-full bg-white border-b border-slate-100 px-5 py-3 flex items-center justify-between sticky top-0 z-40 shadow-sm backdrop-blur-md bg-white/90">
           <Link href="/home" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-inner">
-              <span className="text-white font-black text-sm leading-none">A</span>
+            <div className="w-8 h-8 rounded-lg relative overflow-hidden flex items-center justify-center shadow-sm border border-slate-100">
+               <Image src="/logo.png" alt="AquaIntel Logo" fill style={{ objectFit: 'cover' }} priority />
             </div>
             <span className="font-black text-slate-800 tracking-tight text-lg">AquaIntel</span>
           </Link>

@@ -108,8 +108,8 @@ export default function SignupPage() {
             <ArrowLeft size={20} />
           </Link>
           
-          <div className="w-20 h-20 mb-4 relative overflow-hidden">
-             <Image src="/logo.png" alt="AquaIntel Logo" width={80} height={80} style={{ objectFit: 'contain' }} priority />
+          <div className="w-20 h-20 mb-4 bg-white/5 border border-slate-100 backdrop-blur-md rounded-2xl flex items-center justify-center relative overflow-hidden shadow-xl">
+             <Image src="/logo.png" alt="AquaIntel Logo" width={64} height={64} style={{ objectFit: 'contain' }} priority />
           </div>
           <h2 className="text-2xl font-bold text-[#60A5FA] mb-8">Create Account</h2>
 

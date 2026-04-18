@@ -168,9 +168,9 @@ export default async function HomePage() {
                     <CardContent className="p-4 flex items-center gap-4">
                       <div className={cn(
                         "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-                        scan.quality >= 0.8 ? "bg-blue-50 text-[#60A5FA]" : "bg-red-50 text-red-500"
+                        (scan.quality ?? (scan.safety_score ? scan.safety_score / 100 : 0)) >= 0.8 ? "bg-blue-50 text-[#60A5FA]" : "bg-red-50 text-red-500"
                       )}>
-                        {scan.quality >= 0.8 ? <Shield size={24} /> : <Activity size={24} />}
+                        {(scan.quality ?? (scan.safety_score ? scan.safety_score / 100 : 0)) >= 0.8 ? <Shield size={24} /> : <Activity size={24} />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-slate-800 truncate">
@@ -181,9 +181,9 @@ export default async function HomePage() {
                       <div className="text-right">
                         <span className={cn(
                           "text-lg font-black leading-none block",
-                          scan.quality >= 0.8 ? "text-[#60A5FA]" : "text-red-500"
+                          (scan.quality ?? (scan.safety_score ? scan.safety_score / 100 : 0)) >= 0.8 ? "text-[#60A5FA]" : "text-red-500"
                         )}>
-                          {Math.round((scan.quality || 0) * 100)}%
+                          {scan.safety_score ?? Math.round((scan.quality || 0) * 100)}%
                         </span>
                         <span className="text-[9px] font-black uppercase text-slate-400 tracking-tighter">Safety</span>
                       </div>
