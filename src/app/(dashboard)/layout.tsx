@@ -7,7 +7,6 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Smartphone, Download } from 'lucide-react'
-import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 export default async function DashboardLayout({
   children,
@@ -40,14 +39,11 @@ export default async function DashboardLayout({
             </div>
             <span className="font-black text-slate-800 tracking-tight text-lg">AquaIntel</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <Link href="/download" className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-3.5 py-1.5 rounded-full shadow-md hover:shadow-lg transition-all text-white group">
-               <Smartphone size={14} className="group-hover:-rotate-12 transition-transform" />
-               <span className="text-xs font-bold leading-none tracking-wide">Download</span>
-               <Download size={12} className="ml-0.5 opacity-80" />
-            </Link>
-          </div>
+          <Link href="/download" className="flex items-center gap-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-3.5 py-1.5 rounded-full shadow-md hover:shadow-lg transition-all text-white group">
+             <Smartphone size={14} className="group-hover:-rotate-12 transition-transform" />
+             <span className="text-xs font-bold leading-none tracking-wide">Download</span>
+             <Download size={12} className="ml-0.5 opacity-80" />
+          </Link>
         </div>
 
         <div className="flex-1 overflow-y-auto">
