@@ -153,22 +153,34 @@ export default async function ScanResultPage({
              </CardTitle>
           </CardHeader>
           <CardContent className="p-5 pt-0">
-             {(scan.f1 === null || scan.f1 === undefined) ? (
-               <div className="py-8 text-center bg-slate-50 rounded-2xl">
-                 <p className="text-3xl mb-2">📡</p>
-                 <p className="font-bold text-slate-600">No Spectral Data</p>
-                 <p className="text-xs mt-1 text-slate-400">Wait for direct hardware analysis.</p>
-               </div>
-             ) : (
-               <div className="py-8 text-center bg-slate-50 rounded-2xl">
-                 <p className="text-3xl mb-2">📡</p>
-                 <p className="font-bold text-slate-600">Hardware Reading Details</p>
-                 <p className="text-xs mt-1 text-slate-400">14-channel AS7343 spectral readout.</p>
-                 <p className="mt-3 text-sm font-black text-slate-700">
-                   F1: <span className="text-[#60A5FA]">{scan.f1}</span> | F8: <span className="text-[#60A5FA]">{scan.f8}</span>
-                 </p>
-               </div>
-             )}
+             {(() => {
+               // Prefer pre-simulated full wavelength data if it was saved by Prototype
+               let chartData = scan.wavelength_data;
+               
+               // Fallback: build a graph from raw hardware channels if f1 is available
+               if (!chartData && scan.f1) {
+                 chartData = [
+                   { wavelength: 410, reading: scan.f1, baseline: 0.81 },
+                   { wavelength: 460, reading: scan.f2, baseline: 0.80 },
+                   { wavelength: 510, reading: scan.f3, baseline: 0.75 },
+                   { wavelength: 560, reading: scan.f4, baseline: 0.68 },
+                   { wavelength: 610, reading: scan.f5, baseline: 0.61 },
+                   { wavelength: 680, reading: scan.f6 || 0.4, baseline: 0.41 },
+                 ];
+               }
+
+               if (!chartData) {
+                 return (
+                   <div className="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                     <p className="text-3xl mb-2">📡</p>
+                     <p className="font-bold text-slate-600">No Spectral Data</p>
+                     <p className="text-xs mt-1 text-slate-400">Wait for direct hardware analysis.</p>
+                   </div>
+                 );
+               }
+
+               return <SpectralChart data={chartData} />;
+             })()}
              <div className="mt-4 p-3 bg-slate-50 rounded-2xl flex items-center gap-3">
                 <Info size={16} className="text-slate-400 shrink-0" />
                 <p className="text-[10px] text-slate-500 font-medium leading-tight">
