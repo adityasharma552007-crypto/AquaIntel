@@ -1,0 +1,58 @@
+# dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# testing
+coverage/
+
+# next.js
+.next/
+out/
+
+# production
+build/
+dist/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+blockchain/.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# expo
+.expo/
+dist/
+web-build/
+
+# android
+android/app/build/
+*.apk
+*.aab
+
+# ios
+ios/build/
+*.ipa
+
+# custom
+/tmp/
+.gemini/
+/brain/
+client_secret.json
+*-errors.txt
+supabase/.temp/
