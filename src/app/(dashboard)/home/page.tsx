@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient } from "@/lib/supabase/server"
 import { Shield, ArrowRight, Activity, MapPin, Zap, Bot, AlertTriangle, BrainCircuit } from "lucide-react"
 import Link from "next/link"

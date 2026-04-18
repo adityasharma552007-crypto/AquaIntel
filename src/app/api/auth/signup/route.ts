@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * POST /api/auth/signup
  * Handles user registration with rate limiting protection

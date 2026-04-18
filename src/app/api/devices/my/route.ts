@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/devices/my
  * Returns all iot_devices records for the authenticated user.

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * POST /api/auth/login
  * Handles user login with rate limiting protection

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * Rate Limit Status API
  *

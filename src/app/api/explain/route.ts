@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * POST /api/explain
  * Provides AI-powered explanations of water test results with rate limiting

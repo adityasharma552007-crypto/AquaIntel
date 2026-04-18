@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * POST /api/devices/save
  * Upserts a device record into iot_devices for the authenticated user.

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Groq from 'groq-sdk'
 import { NextRequest } from 'next/server'
 import { checkAndLogRateLimit, getRateLimitHeaders } from '@/lib/supabase/protectedRoute'

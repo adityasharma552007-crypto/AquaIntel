@@ -1,10 +1,12 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient } from "@/lib/supabase/server"
 import { Search, MapPin, SlidersHorizontal, ChevronLeft } from "lucide-react"
 import Link from "next/link"
-import dynamic from "next/dynamic"
+import nextDynamic from "next/dynamic"
 
 // Dynamic import for Leaflet (Client-side only)
-const WaterMap = dynamic(() => import("@/components/WaterMap"), { 
+const WaterMap = nextDynamic(() => import("@/components/WaterMap"), { 
   ssr: false,
   loading: () => <div className="w-full h-full bg-slate-100 animate-pulse rounded-3xl flex items-center justify-center font-black text-slate-300 uppercase tracking-widest">Loading Map...</div>
 })
