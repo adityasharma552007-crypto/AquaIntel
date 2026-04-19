@@ -1,289 +1,102 @@
 'use client'
 
-/**
- * /hardware — IoT Device Management Page
- *
- * Sections:
- *  1. Connected device panel (if paired)
- *  2. Network scanner → discovered device cards
- *  3. Settings (IP range, timeout)
- *  4. Live test controls (start test, progress, results)
- */
-
 import React, { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Cpu, Wifi, ScanLine, Settings2, ChevronLeft,
-  Loader2, AlertCircle, RefreshCw, Play, Zap,
-  PlugZap, Info, ClipboardList, CheckCircle2,
+  Wifi, ChevronLeft, RefreshCw, Zap, Cpu, Activity, Clock
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useDeviceStore, DiscoveredDevice } from '@/store/useDeviceStore'
-import { useDeviceSocket } from '@/hooks/useDeviceSocket'
-import { ConnectionStatus } from '@/components/ConnectionStatus'
-import { DeviceCard } from '@/components/DeviceCard'
-import { TestProgress } from '@/components/TestProgress'
-import { IoTResultsDisplay } from '@/components/IoTResultsDisplay'
-import { useRealtimeScans, getStatusFromQuality } from '@/hooks/useRealtimeScans'
-import { ScanCard } from '@/components/ScanCard'
 import { createClient } from '@/lib/supabase/client'
+import { useRealtimeScans } from '@/hooks/useRealtimeScans'
+import { ScanCard } from '@/components/ScanCard'
 
-const timeAgo = (dateString: string) => {
-  const diff = Date.now() - new Date(dateString).getTime();
-  const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
-  return `${Math.floor(seconds / 60)}m ago`;
-};
-
-// ─── Tabs ─────────────────────────────────────────────────────────────────────
-type Tab = 'device' | 'scanner' | 'settings'
-
-// ─── Settings defaults ────────────────────────────────────────────────────────
-function useSettings() {
-  const [prefix,  setPrefix]  = useState(
-    process.env.NEXT_PUBLIC_DEVICE_IP_PREFIX ?? '192.168.1'
-  )
-  const [start,   setStart]   = useState(
-    Number(process.env.NEXT_PUBLIC_DEVICE_IP_START ?? 1)
-  )
-  const [end,     setEnd]     = useState(
-    Math.min(50, Number(process.env.NEXT_PUBLIC_DEVICE_IP_END ?? 50))
-  )
-  const [port,    setPort]    = useState(
-    Number(process.env.NEXT_PUBLIC_DEVICE_PORT     ?? 8080)
-  )
-
-  // Persist to localStorage
-  useEffect(() => {
-    const raw = localStorage.getItem('mg-device-settings')
-    if (raw) {
-      try {
-        const s = JSON.parse(raw)
-        if (s.prefix) setPrefix(s.prefix)
-        if (s.start)  setStart(s.start)
-        if (s.end)    setEnd(s.end)
-        if (s.port)   setPort(s.port)
-      } catch { /* ignore */ }
-    }
-  }, [])
-
-  const save = () =>
-    localStorage.setItem('mg-device-settings', JSON.stringify({ prefix, start, end, port }))
-
-  return { prefix, setPrefix, start, setStart, end, setEnd, port, setPort, save }
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function HardwarePage() {
-  const router = useRouter()
-  const [tab,                setTab]                = useState<Tab>('device')
-  const [scanLoading,        setScanLoading]        = useState(false)
-  const [scanError,          setScanError]          = useState<string | null>(null)
-  const [isAwaitingReading,  setIsAwaitingReading]  = useState(false)
-  const [awaitPhase,         setAwaitPhase]         = useState<'waiting' | 'found'>('waiting')
+  const [deviceStatus, setDeviceStatus] = useState<"LIVE" | "IDLE" | "OFFLINE">("OFFLINE")
+  const [lastReading, setLastReading] = useState<any>(null)
+  const [todayCount, setTodayCount] = useState(0)
+  const [timeAgoStr, setTimeAgoStr] = useState("No recent data")
+  const [refreshing, setRefreshing] = useState(false)
 
-  const {
-    pairedDevice, connState, discovered,
-    testPhase, testError,
-    setDiscovered, setScanning, setScanError: storeSetScanError,
-    resetTest,
-  } = useDeviceStore()
-
-  const { startTest } = useDeviceSocket()
-  const settings = useSettings()
-  
-  // Realtime Supabase Hook
+  // Realtime Supabase Hook for bottom feed
   const { readings, loading: scansLoading } = useRealtimeScans()
 
-  // ── Hardware Scan Flow ───────────────────────────────────────────────────────
-  // When user taps "Scan Water Now", subscribe to the NEXT water_data INSERT,
-  // wait for the Postgres trigger to create a scans row, then navigate to it.
-  const startHardwareScan = useCallback(async () => {
-    setIsAwaitingReading(true)
-    setAwaitPhase('waiting')
+  const fetchDeviceStatus = useCallback(async () => {
+    setRefreshing(true)
     const supabase = createClient()
+    
+    // Fetch last reading
+    const { data: lastRow } = await supabase
+      .from("water_data")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single()
 
-    const channel = supabase
-      .channel('hardware_scan_once_' + Date.now())
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'water_data' },
-        async (payload) => {
-          const waterDataId = payload.new.id
-          setAwaitPhase('found')
+    if (lastRow) {
+      setLastReading(lastRow)
+    }
 
-          // Wait 1.5s for the trigger to create the scans row
-          await new Promise(r => setTimeout(r, 1500))
+    // Fetch today's count
+    const today = new Date()
+    today.setHours(0,0,0,0)
+    const { count } = await supabase
+      .from("water_data")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", today.toISOString())
+      
+    if (count !== null) setTodayCount(count)
+    
+    setTimeout(() => setRefreshing(false), 500)
+  }, [])
 
-          // Fetch the corresponding scans row
-          const { data: scanRow } = await supabase
-            .from('water_data')
-            .select('id')
-            .eq('source_hardware_id', waterDataId)
-            .single()
-
-          await supabase.removeChannel(channel)
-
-          if (scanRow?.id) {
-            router.push(`/history/${scanRow.id}`)
-          } else {
-            // Fallback: go to history if scan row not found
-            router.push('/history')
-          }
-          setIsAwaitingReading(false)
-        }
-      )
-      .subscribe()
-
-    // Auto-cancel after 60s if no reading arrives
-    setTimeout(() => {
-      supabase.removeChannel(channel)
-      setIsAwaitingReading(false)
-    }, 60000)
-  }, [router])
-  
-  // Calculate hardware connection status
-  const [deviceStatus, setDeviceStatus] = useState<"LIVE" | "WAITING" | "OFFLINE">("WAITING");
-
+  // Auto refresh every 30s
   useEffect(() => {
-    const updateStatus = () => {
-      if (!readings || readings.length === 0) {
-        setDeviceStatus("WAITING");
-        return;
+    fetchDeviceStatus()
+    const interval = setInterval(fetchDeviceStatus, 30000)
+    return () => clearInterval(interval)
+  }, [fetchDeviceStatus])
+
+  // Update time string every 1s
+  useEffect(() => {
+    const updateTime = () => {
+      if (!lastReading) {
+        setDeviceStatus("OFFLINE")
+        setTimeAgoStr("No recent data")
+        return
       }
+      const diffMs = Date.now() - new Date(lastReading.created_at).getTime()
+      const diffSecs = Math.floor(diffMs / 1000)
+      const diffMins = Math.floor(diffSecs / 60)
       
-      const lastReadingTime = new Date(readings[0].created_at).getTime();
-      const diffSeconds = (Date.now() - lastReadingTime) / 1000;
-      
-      if (diffSeconds < 30) {
-        setDeviceStatus("LIVE");
-      } else if (diffSeconds < 120) {
-        setDeviceStatus("WAITING");
+      if (diffSecs < 120) {
+        setDeviceStatus("LIVE")
+        setTimeAgoStr(`Last seen: ${diffSecs} seconds ago`)
+      } else if (diffSecs < 300) {
+        setDeviceStatus("IDLE")
+        setTimeAgoStr(`Last seen: ${diffMins} minutes ago`)
       } else {
-        setDeviceStatus("OFFLINE");
+        setDeviceStatus("OFFLINE")
+        setTimeAgoStr("No recent data")
       }
-    };
-
-    updateStatus();
-    const interval = setInterval(updateStatus, 1000);
-    return () => clearInterval(interval);
-  }, [readings]);
-
-  const isConnected  = connState === 'connected'
-  const isConnecting = connState === 'connecting' || connState === 'reconnecting'
-
-  // ─── Scan network ──────────────────────────────────────────────────────────
-  const scanNetwork = useCallback(async () => {
-    setScanLoading(true)
-    setScanError(null)
-    setScanning(true)
-
-    const params = new URLSearchParams({
-      prefix: settings.prefix,
-      start:  String(settings.start),
-      end:    String(settings.end),
-      port:   String(settings.port),
-    })
-
-    try {
-      const res  = await fetch(`/api/devices/scan?${params}`)
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Scan failed')
-      setDiscovered(data.devices ?? [])
-    } catch (e: any) {
-      setScanError(e.message)
-      storeSetScanError(e.message)
-    } finally {
-      setScanLoading(false)
-      setScanning(false)
     }
-  }, [settings, setDiscovered, setScanning, storeSetScanError])
+    updateTime()
+    const interval = setInterval(updateTime, 1000)
+    return () => clearInterval(interval)
+  }, [lastReading])
 
-  // Auto-scan once on mount when on scanner tab
-  useEffect(() => {
-    if (tab === 'scanner' && discovered.length === 0) {
-      scanNetwork()
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab])
+  const statusColors = {
+    LIVE: "bg-green-500",
+    IDLE: "bg-yellow-500",
+    OFFLINE: "bg-red-500"
+  }
 
-  // ─── Save / forget helpers ─────────────────────────────────────────────────
-  const handleSave = useCallback(async (device: DiscoveredDevice) => {
-    await fetch('/api/devices/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...device,
-        ip_address: device.ip,   // API expects ip_address, store has ip
-      }),
-    })
-  }, [])
+  const badgeColors = {
+    LIVE: "bg-green-50 text-green-700 border-green-200",
+    IDLE: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    OFFLINE: "bg-red-50 text-red-700 border-red-200"
+  }
 
-  const handleForget = useCallback(async (device: DiscoveredDevice) => {
-    await fetch('/api/devices/save', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ip_address: device.ip }),
-    })
-  }, [])
-
-  // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col min-h-screen bg-white">
-
-      {/* ── Hardware Scan Loading Overlay ── */}
-      <AnimatePresence>
-        {isAwaitingReading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center gap-6 px-8"
-          >
-            {awaitPhase === 'waiting' ? (
-              <>
-                {/* Pulsing sensor indicator */}
-                <div className="relative flex items-center justify-center w-32 h-32">
-                  <span className="absolute w-32 h-32 rounded-full bg-[#60A5FA]/10 animate-ping" />
-                  <span className="absolute w-24 h-24 rounded-full bg-[#60A5FA]/20 animate-ping [animation-delay:0.3s]" />
-                  <div className="relative z-10 w-20 h-20 rounded-full bg-[#60A5FA] flex items-center justify-center shadow-2xl shadow-blue-200">
-                    <Wifi size={36} className="text-white" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Scanning Water</p>
-                  <p className="text-sm text-slate-400 font-medium mt-1">Waiting for ESP32 sensor reading…</p>
-                  <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-3">Place sensor in water sample</p>
-                </div>
-                <button
-                  onClick={() => setIsAwaitingReading(false)}
-                  className="text-xs text-slate-400 font-bold uppercase tracking-widest hover:text-slate-600"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                {/* Reading found */}
-                <motion.div
-                  initial={{ scale: 0.5 }}
-                  animate={{ scale: 1 }}
-                  className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center shadow-2xl shadow-green-200"
-                >
-                  <CheckCircle2 size={44} className="text-white" />
-                </motion.div>
-                <div className="text-center">
-                  <p className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Reading Captured!</p>
-                  <p className="text-sm text-slate-400 font-medium mt-1">Generating your report…</p>
-                </div>
-                <Loader2 size={24} className="animate-spin text-[#60A5FA]" />
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* ── Header ── */}
       <header className="px-5 pt-12 pb-4 bg-white">
         <div className="flex items-center justify-between mb-1">
@@ -291,7 +104,7 @@ export default function HardwarePage() {
             <ChevronLeft size={20} className="text-[#60A5FA]" />
           </Link>
           <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">Device</h1>
-          {/* Animated WiFi signal when LIVE */}
+          
           <div className="relative flex items-center justify-center w-9 h-9">
             {deviceStatus === "LIVE" && (
               <>
@@ -299,397 +112,121 @@ export default function HardwarePage() {
                 <span className="absolute inline-flex h-6 w-6 rounded-full bg-green-400 opacity-30 animate-ping [animation-delay:0.2s]" />
               </>
             )}
-            <div className={`relative z-10 p-1.5 rounded-full transition-colors ${
-              deviceStatus === "LIVE" ? "bg-green-100" : "bg-slate-100"
-            }`}>
-              <Wifi size={18} className={deviceStatus === "LIVE" ? "text-green-600" : "text-slate-400"} />
+            <div className={`relative z-10 p-1.5 rounded-full transition-colors bg-slate-100`}>
+              <Wifi size={18} className={deviceStatus === "LIVE" ? "text-green-600" : deviceStatus === "IDLE" ? "text-yellow-500" : "text-red-400"} />
             </div>
           </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-1 mt-4 bg-slate-100 p-1 rounded-2xl">
-          {([
-            { id: 'device',  label: 'Device',  icon: Cpu       },
-            { id: 'scanner', label: 'Scanner', icon: ScanLine  },
-            { id: 'settings',label: 'Settings',icon: Settings2 },
-          ] as { id: Tab; label: string; icon: any }[]).map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${
-                tab === t.id
-                  ? 'bg-white text-[#60A5FA] shadow-sm'
-                  : 'text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              <t.icon size={13} />
-              {t.label}
-            </button>
-          ))}
         </div>
       </header>
 
       {/* ── Body ── */}
-      <main className="flex-1 px-5 py-4 pb-28 space-y-4">
-        <AnimatePresence mode="wait">
+      <main className="flex-1 px-5 py-4 pb-28 space-y-6">
+        
+        {/* Status Banner */}
+        <div className={`px-4 py-3 rounded-2xl flex items-center justify-between text-sm font-bold shadow-sm transition-colors border ${badgeColors[deviceStatus]}`}>
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-3 w-3">
+              {deviceStatus === "LIVE" && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
+              <span className={`relative inline-flex rounded-full h-3 w-3 ${statusColors[deviceStatus]}`}></span>
+            </span>
+            {deviceStatus === "LIVE" ? "🟢 ESP32 Live" :
+             deviceStatus === "IDLE" ? "🟡 ESP32 Idle" : "🔴 ESP32 Offline"}
+          </div>
+          <div className="text-xs opacity-70">
+            {timeAgoStr}
+          </div>
+        </div>
 
-          {/* ════ DEVICE TAB ════ */}
-          {tab === 'device' && (
-            <motion.div
-              key="device"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              className="space-y-4"
-            >
-              {/* Hardware Status Banner */}
-              <div className={`px-4 py-3 rounded-2xl flex items-center justify-between text-sm font-bold shadow-sm transition-colors ${
-                deviceStatus === "LIVE" ? "bg-green-50 text-green-700 border border-green-200" :
-                deviceStatus === "WAITING" ? "bg-yellow-50 text-yellow-700 border border-yellow-200" :
-                "bg-red-50 text-red-700 border border-red-200"
-              }`}>
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-3 w-3">
-                    {deviceStatus === "LIVE" && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
-                    <span className={`relative inline-flex rounded-full h-3 w-3 ${
-                      deviceStatus === "LIVE" ? "bg-green-500" :
-                      deviceStatus === "WAITING" ? "bg-yellow-500" : "bg-red-500"
-                    }`}></span>
-                  </span>
-                  {deviceStatus === "LIVE" ? "ESP32 Connected — Live" :
-                   deviceStatus === "WAITING" ? "Waiting for device..." : "Device Offline"}
-                </div>
-                <div className="text-xs opacity-70">
-                  {readings.length > 0 ? `Last: ${timeAgo(readings[0].created_at)}` : ''}
-                </div>
+        {/* Device Info Card */}
+        <div className="rounded-3xl border border-slate-100 shadow-sm overflow-hidden bg-white">
+          <div className="px-5 py-4 flex items-center justify-between bg-slate-50 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-100">
+                <Cpu size={20} className="text-[#60A5FA]" />
               </div>
-
-              {!pairedDevice ? (
-                /* No device paired */
-                <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
-                  <div className={`w-20 h-20 rounded-3xl flex items-center justify-center transition-colors ${
-                    deviceStatus === "LIVE" ? "bg-green-50" : "bg-slate-50"
-                  }`}>
-                    <Cpu size={32} className={deviceStatus === "LIVE" ? "text-green-500" : "text-slate-300"} />
-                  </div>
-                  <div>
-                    <p className="font-black text-slate-700 tracking-tight">
-                      {deviceStatus === "LIVE" ? "ESP32 is Live!" : "No Device Connected"}
-                    </p>
-                    <p className="text-slate-400 text-xs mt-1 max-w-[220px] leading-relaxed">
-                      {deviceStatus === "LIVE"
-                        ? "Your hardware sensor is active and sending data. Tap below to start a water scan."
-                        : "No readings received yet. Make sure your ESP32 is powered on and connected to WiFi."}
-                    </p>
-                  </div>
-                  {deviceStatus === "LIVE" ? (
-                    <button
-                      onClick={startHardwareScan}
-                      className="flex items-center gap-2 px-6 py-3.5 bg-[#60A5FA] text-white text-sm font-black rounded-2xl hover:bg-[#3B82F6] transition-all shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      <Play size={15} fill="white" /> Scan Water Now
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setTab('scanner')}
-                      className="flex items-center gap-2 px-5 py-3 bg-slate-200 text-slate-500 text-sm font-black rounded-2xl"
-                    >
-                      <ScanLine size={15} /> Scan for Devices
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <>
-                  {/* Paired device info */}
-                  <div className="rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                    {/* Coloured header */}
-                    <div className={`px-5 py-4 flex items-center justify-between ${
-                      isConnected ? 'bg-[#60A5FA]' : 'bg-slate-700'
-                    }`}>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                          <Cpu size={20} className="text-white" />
-                        </div>
-                        <div>
-                          <p className="text-white font-black text-base tracking-tight leading-none">
-                            {pairedDevice.display_name ?? pairedDevice.device_id ?? 'AquaIntel Pod'}
-                          </p>
-                          <p className="text-white/60 text-[10px] font-bold mt-0.5 uppercase tracking-widest">
-                            {pairedDevice.ip}:{pairedDevice.port}
-                          </p>
-                        </div>
-                      </div>
-                      <ConnectionStatus showLabel={false} className="!bg-white/20 !text-white" />
-                    </div>
-
-                    {/* Device metadata */}
-                    <div className="px-5 py-4 grid grid-cols-2 gap-3">
-                      {[
-                        { label: 'Firmware', value: pairedDevice.firmware ?? 'Unknown' },
-                        { label: 'Model',    value: pairedDevice.model    ?? 'Unknown' },
-                        { label: 'IP',       value: pairedDevice.ip },
-                        { label: 'Port',     value: String(pairedDevice.port) },
-                      ].map((row) => (
-                        <div key={row.label} className="bg-slate-50 rounded-xl px-3 py-2">
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{row.label}</p>
-                          <p className="text-sm font-black text-slate-700 mt-0.5 truncate">{row.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* ── Test controls ── */}
-                  {testPhase === 'idle' && (
-                    deviceStatus === 'LIVE' ? (
-                      <button
-                        onClick={startHardwareScan}
-                        className="w-full flex items-center justify-center gap-2.5 py-5 bg-[#60A5FA] text-white rounded-2xl font-black text-base tracking-tight hover:bg-[#3B82F6] transition-all shadow-lg shadow-blue-200 hover:scale-[1.01] active:scale-[0.98]"
-                      >
-                        <Play size={20} fill="white" /> Scan Water Now
-                      </button>
-                    ) : (
-                      <motion.button
-                        whileTap={{ scale: 0.97 }}
-                        disabled
-                        className="w-full flex items-center justify-center gap-2.5 py-5 bg-slate-100 text-slate-400 rounded-2xl font-black text-base tracking-tight cursor-not-allowed"
-                      >
-                        {deviceStatus === 'WAITING' ? (
-                          <><Loader2 size={20} className="animate-spin" /> Waiting for ESP32…</>
-                        ) : (
-                          <><PlugZap size={20} /> Device Offline</>  
-                        )}
-                      </motion.button>
-                    )
-                  )}
-
-                  {/* Live test progress */}
-                  {(testPhase === 'running') && <TestProgress />}
-
-                  {/* Test error */}
-                  {testPhase === 'error' && (
-                    <div className="rounded-2xl bg-red-50 border border-red-100 p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-red-600">
-                        <AlertCircle size={18} />
-                        <p className="font-bold text-sm">{testError}</p>
-                      </div>
-                      <button
-                        onClick={resetTest}
-                        className="text-xs text-red-500 font-bold hover:underline flex items-center gap-1"
-                      >
-                        <RefreshCw size={12} /> Try again
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Results */}
-                  {testPhase === 'done' && <IoTResultsDisplay />}
-                  
-                  {/* Realtime ESP32 Stream */}
-                  {testPhase === 'idle' && (
-                    <div className="mt-8 space-y-3">
-                      <h3 className="font-black text-slate-700 uppercase tracking-tight flex items-center gap-2">
-                        <Zap size={16} className="text-blue-500" /> Live Data Stream
-                      </h3>
-                      
-                      {scansLoading ? (
-                        <div className="flex justify-center p-8 text-slate-400">
-                          <Loader2 className="animate-spin w-6 h-6" />
-                        </div>
-                      ) : readings.length === 0 ? (
-                        <div className="text-center bg-slate-50 border border-slate-100 rounded-2xl py-10">
-                          <p className="font-bold text-slate-400">Waiting for readings...</p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {readings.map((reading, i) => (
-                            <ScanCard key={reading.id} scan={reading} index={i} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </motion.div>
-          )}
-
-          {/* ════ SCANNER TAB ════ */}
-          {tab === 'scanner' && (
-            <motion.div
-              key="scanner"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              className="space-y-4"
-            >
-              {/* Scan button */}
-              <button
-                onClick={scanNetwork}
-                disabled={scanLoading}
-                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-[#60A5FA]/30 text-[#60A5FA] font-black text-sm hover:bg-[#60A5FA]/5 transition-colors disabled:opacity-60"
-              >
-                {scanLoading ? (
-                  <><Loader2 size={16} className="animate-spin" /> Scanning {settings.prefix}.{settings.start}–{settings.end}…</>
-                ) : (
-                  <><ScanLine size={16} /> Scan Network</>
-                )}
-              </button>
-
-              {/* Scan error */}
-              {scanError && (
-                <div className="flex items-center gap-2 text-red-500 text-xs font-bold bg-red-50 px-3 py-2 rounded-xl">
-                  <AlertCircle size={14} /> {scanError}
-                </div>
-              )}
-
-              {/* Hint */}
-              <div className="flex items-start gap-2 bg-blue-50 px-3 py-2 rounded-xl">
-                <Info size={14} className="text-blue-400 shrink-0 mt-0.5" />
-                <p className="text-[10px] text-blue-400 font-medium leading-relaxed">
-                  Your ESP device and this phone must be on the same Wi-Fi network.
-                  Scanning range: <strong>{settings.prefix}.{settings.start}–{settings.end}</strong>
+              <div>
+                <p className="text-slate-800 font-black text-base tracking-tight leading-none">
+                  AquaIntel Hardware
+                </p>
+                <p className="text-slate-400 text-[10px] font-bold mt-0.5 uppercase tracking-widest">
+                  ESP32 SENSOR NODE
                 </p>
               </div>
+            </div>
+            <div className={`px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${badgeColors[deviceStatus]}`}>
+              {deviceStatus}
+            </div>
+          </div>
 
-              {/* Found devices */}
-              {!scanLoading && discovered.length > 0 && (
-                <div className="space-y-3">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                    Found {discovered.length} device{discovered.length !== 1 ? 's' : ''}
-                  </p>
-                  {discovered.map((device) => (
-                    <DeviceCard
-                      key={device.ip}
-                      device={device}
-                      onSave={handleSave}
-                      onForget={handleForget}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* No devices found */}
-              {!scanLoading && discovered.length === 0 && !scanError && (
-                <div className="flex flex-col items-center py-12 text-center gap-3">
-                  <Wifi size={32} className="text-slate-200" />
-                  <p className="text-slate-400 text-sm font-bold">No devices found</p>
-                  <p className="text-slate-300 text-xs max-w-[220px] leading-relaxed">
-                    Make sure your ESP device is powered on and connected to the same network.
-                    Tap "Scan Network" to try again.
-                  </p>
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* ════ SETTINGS TAB ════ */}
-          {tab === 'settings' && (
-            <motion.div
-              key="settings"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              className="space-y-5"
-            >
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                Network Settings
+          <div className="px-5 py-4 grid grid-cols-2 gap-3">
+            <div className="bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                <Clock size={10} /> Last Reading
               </p>
+              <p className="text-sm font-black text-slate-700 mt-0.5 truncate">
+                {lastReading ? new Date(lastReading.created_at).toLocaleTimeString() : 'N/A'}
+              </p>
+            </div>
+            <div className="bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                <Activity size={10} /> Last Quality
+              </p>
+              <p className="text-sm font-black text-slate-700 mt-0.5 truncate">
+                {lastReading?.quality != null ? `${Math.round(lastReading.quality * 100)}%` : 'N/A'}
+              </p>
+            </div>
+            <div className="bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                <Zap size={10} /> Last Status
+              </p>
+              <p className={`text-sm font-black mt-0.5 truncate ${lastReading?.status === 'Pure' ? 'text-[#60A5FA]' : lastReading?.status ? 'text-red-500' : 'text-slate-700'}`}>
+                {lastReading?.status ?? 'N/A'}
+              </p>
+            </div>
+            <div className="bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                <Activity size={10} /> Today's Scans
+              </p>
+              <p className="text-sm font-black text-slate-700 mt-0.5 truncate">
+                {todayCount}
+              </p>
+            </div>
+          </div>
+        </div>
 
-              {/* IP Prefix */}
-              <div className="space-y-1">
-                <label className="text-xs font-black text-slate-600 uppercase tracking-wider">
-                  IP Prefix
-                </label>
-                <input
-                  type="text"
-                  value={settings.prefix}
-                  onChange={(e) => settings.setPrefix(e.target.value)}
-                  placeholder="192.168.1"
-                  className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#60A5FA]"
-                />
-                <p className="text-[10px] text-slate-400">e.g. 192.168.1 or 192.168.0</p>
-              </div>
-
-              {/* Range */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-600 uppercase tracking-wider">
-                    Range Start
-                  </label>
-                  <input
-                    type="number" min={1} max={254}
-                    value={settings.start}
-                    onChange={(e) => settings.setStart(Number(e.target.value))}
-                    className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#60A5FA]"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-600 uppercase tracking-wider">
-                    Range End
-                  </label>
-                  <input
-                    type="number" min={1} max={254}
-                    value={settings.end}
-                    onChange={(e) => settings.setEnd(Number(e.target.value))}
-                    className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#60A5FA]"
-                  />
-                </div>
-              </div>
-
-              {/* Port */}
-              <div className="space-y-1">
-                <label className="text-xs font-black text-slate-600 uppercase tracking-wider">
-                  Device Port
-                </label>
-                <input
-                  type="number" min={1} max={65535}
-                  value={settings.port}
-                  onChange={(e) => settings.setPort(Number(e.target.value))}
-                  placeholder="8080"
-                  className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#60A5FA]"
-                />
-              </div>
-
-              {/* Save */}
-              <button
-                onClick={() => { settings.save(); setTab('scanner') }}
-                className="w-full py-3 bg-[#60A5FA] text-white rounded-xl font-black text-sm hover:bg-[#3B82F6] transition-colors"
-              >
-                Save & Scan
-              </button>
-
-              {/* Protocol info */}
-              <div className="rounded-2xl border border-slate-100 p-4 space-y-2">
-                <div className="flex items-center gap-2">
-                  <ClipboardList size={14} className="text-slate-400" />
-                  <p className="text-xs font-black text-slate-600 uppercase tracking-wider">
-                    ESP Protocol Reference
-                  </p>
-                </div>
-                <div className="bg-slate-900 rounded-xl p-3 text-[10px] font-mono text-green-400 space-y-1 overflow-x-auto">
-                  <p>{`// Supabase REST insert (AS7343 → water_data)`}</p>
-                  <p className="text-slate-400">{`POST https://<project>.supabase.co/rest/v1/water_data`}</p>
-                  <p className="mt-2">{`// Required body (14 channels + quality)`}</p>
-                  <p className="text-slate-400">{`{ "f1":..., "f2":..., "f3":..., "f4":...,`}</p>
-                  <p className="text-slate-400 pl-2">{`"f5":..., "f6":..., "f7":..., "f8":...,`}</p>
-                  <p className="text-slate-400 pl-2">{`"nir":..., "clear":..., "quality":0.85 }`}</p>
-                  <p className="mt-2">{`// Auth header`}</p>
-                  <p className="text-slate-400">{`apikey: <supabase-anon-key>`}</p>
-                </div>
-              </div>
-
-              {/* Demo mode info */}
-              <div className="flex items-start gap-2 bg-[#60A5FA]/5 px-3 py-2.5 rounded-xl">
-                <Zap size={14} className="text-[#60A5FA] shrink-0 mt-0.5" />
-                <p className="text-[10px] text-[#60A5FA] font-medium leading-relaxed">
-                  <strong>No device yet?</strong> The scan will still show the UI. Connect a real ESP or add a demo device via the scanner to preview the test flow.
-                </p>
-              </div>
-            </motion.div>
+        {/* Refresh Button */}
+        <button
+          onClick={fetchDeviceStatus}
+          disabled={refreshing}
+          className="w-full flex items-center justify-center gap-2 py-4 bg-[#60A5FA] text-white rounded-2xl font-black text-sm hover:bg-[#3B82F6] transition-all shadow-lg shadow-blue-200 hover:scale-[1.01] active:scale-[0.98] disabled:opacity-70 disabled:hover:scale-100"
+        >
+          <RefreshCw size={18} className={refreshing ? "animate-spin" : ""} /> 
+          {refreshing ? "Refreshing..." : "Refresh Status"}
+        </button>
+        
+        {/* Realtime ESP32 Stream */}
+        <div className="mt-8 space-y-3">
+          <h3 className="font-black text-slate-700 uppercase tracking-tight flex items-center gap-2">
+            <Zap size={16} className="text-blue-500" /> Live Data Stream
+          </h3>
+          
+          {scansLoading ? (
+            <div className="flex justify-center p-8 text-slate-400">
+              <RefreshCw className="animate-spin w-6 h-6" />
+            </div>
+          ) : readings.length === 0 ? (
+            <div className="text-center bg-slate-50 border border-slate-100 rounded-2xl py-10">
+              <p className="font-bold text-slate-400">Waiting for readings...</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {readings.map((reading, i) => (
+                <ScanCard key={reading.id} scan={reading} index={i} />
+              ))}
+            </div>
           )}
+        </div>
 
-        </AnimatePresence>
       </main>
     </div>
   )
